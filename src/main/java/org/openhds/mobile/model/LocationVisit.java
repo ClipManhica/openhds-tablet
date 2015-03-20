@@ -273,13 +273,15 @@ public class LocationVisit implements Serializable {
     //Generate the locationName to handle the HouseNo Code (##-####-###) from Manhiça DSS
  	private String generateLocationName(ContentResolver resolver) { 		 		 
  		
+ 		String cluster = (isClip() ? getClusterId(getLatestLevelName())+"-" : "" );
+ 		
          Cursor cursor = resolver.query(OpenHDS.Locations.CONTENT_ID_URI_BASE,
                  new String[] { OpenHDS.Locations.COLUMN_LOCATION_NAME }, OpenHDS.Locations.COLUMN_LOCATION_NAME
-                         + " LIKE ?", new String[] { getLatestLevelName() + "%" }, OpenHDS.Locations.COLUMN_LOCATION_NAME
+                         + " LIKE ?", new String[] { cluster + getLatestLevelName() + "%" }, OpenHDS.Locations.COLUMN_LOCATION_NAME
                          + " ASC");
 
          String generatedName = null;
-         String baseName = getLatestLevelName(); 
+         String baseName = cluster + getLatestLevelName(); 
          
          //001-999
          //NEXT       
@@ -328,7 +330,7 @@ public class LocationVisit implements Serializable {
          }
 
          cursor.close();
-         return generatedName;
+         return cluster + generatedName;
      }
 
     private void setLatestLevelExtId (ContentResolver resolver) {
@@ -701,4 +703,47 @@ public class LocationVisit implements Serializable {
 		return ids;
 	}
 
+    private boolean isClip(){
+		return true;
+	}
+	
+	private String getClusterId(String nbCode){
+		java.util.Map<String,String> maps = new java.util.HashMap<String, String>();
+        
+        maps.put("01", "01");
+        maps.put("02", "01");
+        maps.put("03", "01");
+        maps.put("04", "01");
+        maps.put("05", "01");
+        maps.put("06", "01");
+        maps.put("07", "01");
+        maps.put("08", "01");
+        maps.put("09", "01");
+        maps.put("10", "01");
+        maps.put("37", "01");
+        maps.put("38", "01");
+        maps.put("33", "02");
+        maps.put("39", "02");
+        maps.put("31", "03");
+        maps.put("32", "03");
+        maps.put("34", "03");
+        maps.put("35", "03");
+        maps.put("60", "04");
+        maps.put("61", "05");
+        maps.put("62", "06");
+        maps.put("63", "07");
+        maps.put("64", "08");
+        maps.put("65", "09");
+        maps.put("66", "10");
+        maps.put("67", "11");
+        maps.put("68", "12");
+		
+		String code = nbCode.substring(0,2);
+		
+		if (maps.containsKey(code)){
+			return maps.get(code);
+		}
+		
+		return "00";
+	}
 }
