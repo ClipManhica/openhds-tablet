@@ -1,0 +1,118 @@
+package org.openhds.mobile.clip.database;
+
+import java.util.Collection;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
+
+public class Database {
+	
+	public static final String DATABASE_NAME = "clip.db";
+	public static final int DATABASE_VERSION = 1;
+	
+	public static final class PregnancyId implements BaseColumns {
+		public static final String TABLE_NAME = "pregnancy_identification";
+		
+		public static final String COLUMN_ID = "id";
+		public static final String COLUMN_INDIVIDUAL_ID = "individualId";
+		public static final String COLUMN_PERM_ID = "permId";
+		public static final String COLUMN_PREGNANCY_ID = "pregnancyId";
+		public static final String COLUMN_COUNT = "count";
+		
+		public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_INDIVIDUAL_ID, COLUMN_PERM_ID, COLUMN_PREGNANCY_ID, COLUMN_COUNT};
+	}
+	
+	private DatabaseHelper dbHelper;
+	private SQLiteDatabase database;
+	
+	public Database(Context context) {
+		dbHelper = new DatabaseHelper(context);
+	}
+	
+	public void open() throws SQLException {
+	    database = dbHelper.getWritableDatabase();
+	}
+
+    public void close() {
+	    dbHelper.close();
+	}
+    
+    public long insert(Table entity){  	    	
+    	long insertId = -1;
+    	
+    	insertId = database.insert(entity.getTableName(), null,  entity.getContentValues());
+    	
+    	return insertId;
+    }
+    
+    public long insert(Collection<? extends Table> entities){  	    	
+    	long insertId = -1;
+    	
+    	for (Table entity : entities){
+    		insertId = database.insert(entity.getTableName(), null,  entity.getContentValues());
+    	}
+    	
+    	return insertId;
+    }
+    
+    public int delete(Class<? extends Table> table, String whereClause, String[] whereArgs){
+    	Table entity = newInstance(table);
+    	
+    	int deleteRows = database.delete(entity.getTableName(), whereClause, whereArgs);
+    	return deleteRows;
+    }
+    
+    public int update(Class<? extends Table> table, ContentValues values, String whereClause, String[] whereArgs){    	
+    	Table entity = newInstance(table);
+    	
+    	int rows = database.update(entity.getTableName(), values, whereClause, whereArgs);
+    	
+    	return rows;
+    }
+    
+    /*
+    public int update(Table entity){    	
+    	    	
+    	long rows = database.update(entity.getTableName(), entity.getContentValues(), BaseColumns._ID + " = ?", new String{entity.get});
+    	
+    	return 0;
+    }
+    */
+    
+    public Cursor query(Class<? extends Table> table, String selection, String[] selectionArgs, String groupBy, String having, String orderBy){    	
+    	Table entity = newInstance(table);
+    	
+    	Cursor cursor = database.query(entity.getTableName(), entity.getColumnNames(), selection, selectionArgs, groupBy, having, orderBy);
+        	
+    	return cursor;
+    }
+    
+    public Cursor query(Class<? extends Table> table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy){
+    	Table entity = newInstance(table);
+    	
+    	Cursor cursor = database.query(entity.getTableName(), columns, selection, selectionArgs, groupBy, having, orderBy);
+        	
+    	return cursor;
+    }
+    
+    private Table newInstance(Class<? extends Table> entity){
+    	try {
+			Table obj =  entity.newInstance();
+			return obj;
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return null;
+    }
+    
+    
+}

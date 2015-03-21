@@ -57,6 +57,8 @@ public class FilledForm {
     private String motherName;
     private String fatherName;
     
+    private String pregnancyId;
+    
     public FilledForm(String formName) {
         this.formName = formName;
     }
@@ -372,5 +374,13 @@ public class FilledForm {
 	public void setFatherName(String fatherName) {
 		this.fatherName = fatherName;
 	}
+
+	public String getPregnancyId() {
+		return pregnancyId;
+	}
+
+	public void setPregnancyId(String pregnancyId) {
+		this.pregnancyId = pregnancyId;
+	}	
 		
 }
