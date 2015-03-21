@@ -3,7 +3,7 @@
     
     
     <string name="amendments">Amendements</string>
-    <string name="app_name">OpenHDS (Manhiça DSS)</string>
+    <string name="app_name">OpenHDS CLIP</string>
     <string name="bad_authentication">Echec Authentication</string>
     <string name="register">Registre</string>
     <string name="bad_xml">Erreur d\'analyse XML</string>
@@ -15,16 +15,16 @@
     <string name="databaseSync">Synchroniser avec la base de données de OpenHDS</string>
 	<string name="sync_database_name">Synchroniser Base de données</string>    
     <string name="choose">Prière choisir </string>
-    <string name="default_server_url">http://data-management.local:8080/openhds/mobile-interop</string>
+    <string name="default_server_url">http://sap.manhica.net:4780/openhds-clip/mobile-interop</string>
     <string name="interop_server_url_key">interop_server_url</string>
-	<string name="default_openhds_server_url">http://data-management.local:8080/openhds</string>    
-	<string name="openhds_server_url">http://data-management.local:8080/openhds</string>
+	<string name="default_openhds_server_url">http://sap.manhica.net:4780/openhds-clip</string>    
+	<string name="openhds_server_url">http://sap.manhica.net:4780/openhds-clip</string>
     <string name="openhds_server_url_default_summary">Même URL utilisé pour le serveur OpenHDS via un navigateur Web</string>    
 	<string name="openhds_server_url_key">openhds_server_url</string>
 	<string name="openhds_server_url_title">OpenHDS Server URL</string>
 	<string name="supervisor_login_url">/api/rest/socialgroups</string>	
 	<string name="supervisor_login">Connection Superviseur</string>	
-    <string name="default_openhdsserver">http://data-management.local:8080/openhds</string>
+    <string name="default_openhdsserver">http://sap.manhica.net:4780/openhds-clip</string>
     <string name="delete_form_btn">Supprimer Formulaire</string>
     <string name="download_form_button">Télécharger Formulaires</string>
     <string name="download_extraform_button">Télécharger Formulaires Extra</string>
@@ -138,8 +138,8 @@
 	<string name="relationshipBtn_lbl">relations</string>
 	<string name="inMigrationBtn_lbl">Immigrations</string>
 	<string name="outMigrationBtn_lbl">Emigration</string>
-	<string name="pregRegBtn_lbl">Observation Grossesse </string>
-	<string name="birthRegBtn_lbl">Issue de la grossesse</string>
+	<string name="pregRegBtn_lbl">Form D</string>
+	<string name="birthRegBtn_lbl">Form E</string>
 	<string name="deathBtn_lbl">Décès</string>
 	<string name="finishVisitBtn_lbl">Terminer Visite</string>
     

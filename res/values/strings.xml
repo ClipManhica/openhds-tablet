@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:locale="en">
 
     <string name="amendments">Amendments</string>
-    <string name="app_name">OpenHDS (Manhiça DSS)</string>
+    <string name="app_name">OpenHDS CLIP</string>
     <string name="bad_authentication">Authentication Failed</string>
     <string name="register">Register</string>
     <string name="bad_xml">Error parsing XML</string>
@@ -14,16 +14,16 @@
     <string name="databaseSync">Sync with OpenHDS Database</string>
     <string name="sync_database_name">Sync Database</string>
     <string name="choose">Please choose </string>
-    <string name="default_server_url">http://sap.manhica.net:4780/openhds/mobile-interop</string>
+    <string name="default_server_url">http://sap.manhica.net:4780/openhds-clip/mobile-interop</string>
     <string name="interop_server_url_key">interop_server_url</string>
-    <string name="default_openhds_server_url">http://sap.manhica.net:4780/openhds</string>
-    <string name="openhds_server_url">http://sap.manhica.net:4780/openhds</string>
+    <string name="default_openhds_server_url">http://sap.manhica.net:4780/openhds-clip</string>
+    <string name="openhds_server_url">http://sap.manhica.net:4780/openhds-clip</string>
     <string name="openhds_server_url_default_summary">Same URL used for OpenHDS Server via Web browser</string>
     <string name="openhds_server_url_key">openhds_server_url</string>
     <string name="openhds_server_url_title">OpenHDS Server URL</string>
     <string name="supervisor_login_url">/api/rest/socialgroups</string>
     <string name="supervisor_login">Supervisor Login</string>
-    <string name="default_openhdsserver">http://sap.manhica.net:4780/openhds</string>
+    <string name="default_openhdsserver">http://sap.manhica.net:4780/openhds-clip</string>
     <string name="delete_form_btn">Delete Form</string>
     <string name="download_form_button">Download Forms</string>
     <string name="download_extraform_button">Download Extra Forms</string>
@@ -143,8 +143,8 @@
     <string name="relationshipBtn_lbl">Relationship</string>
     <string name="inMigrationBtn_lbl">In Migration</string>
     <string name="outMigrationBtn_lbl">Out Migration</string>
-    <string name="pregRegBtn_lbl">Pregnancy Observation</string>
-    <string name="birthRegBtn_lbl">Pregnancy Outcome</string>
+    <string name="pregRegBtn_lbl">Form D</string>
+    <string name="birthRegBtn_lbl">Form E</string>
     <string name="deathBtn_lbl">Death</string>
     <string name="finishVisitBtn_lbl">Finish Visit</string>
     <string name="fworkerExtId_lbl">Field Worker ExtId</string>

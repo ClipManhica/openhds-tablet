@@ -2,7 +2,7 @@
 <resources  xmlns:tools="http://schemas.android.com/tools" tools:locale="es">
 
     <string name="amendments">Enmiendas</string>
-    <string name="app_name">OpenHDS (Manhiça DSS)</string>
+    <string name="app_name">OpenHDS CLIP</string>
     <string name="bad_authentication">Autenticación Falló</string>
     <string name="register">Registrarse</string>
     <string name="bad_xml">Error en validar el XML</string>
@@ -14,16 +14,16 @@
     <string name="databaseSync">Sincronizar con OpenHDS Base de Datos</string>
   	<string name="sync_database_name">Sincronizar Base de Datos</string>    
     <string name="choose">Por favor, elija</string>
-    <string name="default_server_url">http://data-management.local:8080/openhds/mobile-interop</string>
+    <string name="default_server_url">http://sap.manhica.net:4780/openhds-clip/mobile-interop</string>
     <string name="interop_server_url_key">interop_server_url</string>
-	  <string name="default_openhds_server_url">http://data-management.local:8080/openhds</string>    
-	  <string name="openhds_server_url">http://data-management.local:8080/openhds</string>
+	  <string name="default_openhds_server_url">http://sap.manhica.net:4780/openhds-clip</string>    
+	  <string name="openhds_server_url">http://sap.manhica.net:4780/openhds-clip</string>
     <string name="openhds_server_url_default_summary">Same URL used for OpenHDS Server via Web browser</string>    
 	  <string name="openhds_server_url_key">openhds_server_url</string> 
 	  <string name="openhds_server_url_title">URL del OpenHDS Server</string>
 	  <string name="supervisor_login_url">/api/rest/socialgroups</string>
     <string name="supervisor_login">Supervisor</string>
-    <string name="default_openhdsserver">http://data-management.local:8080/openhds</string>
+    <string name="default_openhdsserver">http://sap.manhica.net:4780/openhds-clip</string>
 	  <string name="delete_form_btn">Borrar Impreso</string>
     <string name="download_form_button">Descargar Impresos</string>
     <string name="download_extraform_button">Descarga cuestionarios adicionales</string>
@@ -116,8 +116,8 @@
 	<string name="relationshipBtn_lbl">Relación</string>
 	<string name="inMigrationBtn_lbl">Inmigración</string>
 	<string name="outMigrationBtn_lbl">Enmigración</string>
-	<string name="pregRegBtn_lbl">Observación Embarazo</string>
-	<string name="birthRegBtn_lbl">Resultado del Embarazo</string>
+	<string name="pregRegBtn_lbl">Form D</string>
+	<string name="birthRegBtn_lbl">Form E</string>
 	<string name="deathBtn_lbl">Muerte</string>
 	<string name="finishVisitBtn_lbl">Terminar la Visita</string>  	
   	
