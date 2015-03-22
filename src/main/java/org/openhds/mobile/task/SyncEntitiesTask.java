@@ -24,6 +24,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.openhds.mobile.OpenHDS;
 import org.openhds.mobile.R;
+import org.openhds.mobile.clip.model.PregnacyIdentification;
 import org.openhds.mobile.listener.SyncDatabaseListener;
 import org.openhds.mobile.model.Settings;
 import org.xmlpull.v1.XmlPullParser;
@@ -76,7 +77,7 @@ public class SyncEntitiesTask extends
 	}
 
 	private enum Entity {
-		LOCATION_HIERARCHY, LOCATION, ROUND, VISIT, RELATIONSHIP, INDIVIDUAL, SOCIALGROUP, LOCATION_HIERARCHY_LEVELS, SETTINGS
+		LOCATION_HIERARCHY, LOCATION, ROUND, VISIT, RELATIONSHIP, INDIVIDUAL, SOCIALGROUP, LOCATION_HIERARCHY_LEVELS, SETTINGS, PREGNANCY_IDS
 	}
 
 	private Context mContext;
@@ -132,6 +133,9 @@ public class SyncEntitiesTask extends
 			break;
 		case SETTINGS:
 			builder.append(mContext.getString(R.string.sync_task_settings));
+			break;		
+		case PREGNANCY_IDS:
+			builder.append(mContext.getString(R.string.sync_task_clip_pregnancy_ids));
 			break;			
 		}
 
@@ -155,8 +159,9 @@ public class SyncEntitiesTask extends
 		// at this point, we don't care to be smart about which data to
 		// download, we simply download it all
 		deleteAllTables();
-
+		
 		try {
+			
 			entity = Entity.LOCATION_HIERARCHY;
 			processUrl(baseurl + API_PATH + "/locationhierarchies");
 
@@ -183,6 +188,9 @@ public class SyncEntitiesTask extends
 			
 			entity = Entity.SETTINGS;
 			processUrl(baseurl + API_PATH + "/settings");
+			
+			entity = Entity.PREGNANCY_IDS;
+			processUrl("http://sap.manhica.net:4700/files/clip/pregnancy_ids.xml");
 		} catch (Exception e) {
 			return HttpTask.EndResult.FAILURE;
 		}
@@ -204,6 +212,8 @@ public class SyncEntitiesTask extends
 		resolver.delete(OpenHDS.Individuals.CONTENT_ID_URI_BASE, null, null);
 		resolver.delete(OpenHDS.Locations.CONTENT_ID_URI_BASE, null, null);
 		resolver.delete(OpenHDS.Settings.CONTENT_ID_URI_BASE, null, null);
+		
+		deleteAllClipDatabase();
 	}
 
 	private void processUrl(String url) throws Exception {
@@ -276,6 +286,8 @@ public class SyncEntitiesTask extends
 					processRelationshipParams(parser);
 				} else if(name.equalsIgnoreCase("generalSettings")) {
 					processSettingsParams(parser);
+				} else if(name.equalsIgnoreCase("pregnaciesIdenfications")) {
+					processPregnancyIdsParams(parser);
 				}
 				break;
 			}
@@ -797,4 +809,76 @@ public class SyncEntitiesTask extends
 	protected void onPostExecute(HttpTask.EndResult result) {
 		listener.collectionComplete(result);
 	}
+	
+	private void processPregnancyIdsParams(XmlPullParser parser) throws XmlPullParserException, IOException {
+		
+		org.openhds.mobile.clip.database.Database database = new org.openhds.mobile.clip.database.Database(mContext);
+        database.open();
+		
+        values.clear();
+		
+		int count = 0;
+		List<PregnacyIdentification> valuesTb = new ArrayList<PregnacyIdentification>();
+		
+        
+		parser.nextTag();
+		
+		while (notEndOfXmlDoc("pregnaciesIdenfications", parser)) {
+			count++;
+						
+			PregnacyIdentification pregId = new PregnacyIdentification();
+			
+			parser.nextTag(); //individualId
+			pregId.setIndividualId(parser.nextText());
+			
+			//Log.d("individualId", parser.nextText());
+			
+			parser.nextTag(); //permId						
+			pregId.setPermId(parser.nextText());
+			
+			//Log.d("permId", parser.nextText());
+			
+			parser.nextTag(); //pregnancyId
+			pregId.setPregnancyId(parser.nextText());
+			
+			//Log.d("pregnancyId", parser.nextText());
+			
+			parser.nextTag(); //count
+			pregId.setCount(Integer.parseInt(parser.nextText()));
+			
+			//Log.d("count", parser.nextText());
+						
+			valuesTb.add(pregId);
+			
+			publishProgress(count);
+
+			parser.nextTag(); // </pregnancyIdentification>
+			parser.nextTag(); // <pregnancyIdentification>			
+			
+		}
+		
+		state = State.SAVING;
+		entity = Entity.PREGNANCY_IDS;
+		
+		if (!valuesTb.isEmpty()) {
+			count = 0;
+			for (PregnacyIdentification p : valuesTb){
+				count++;
+				database.insert(p);
+				publishProgress(count);
+			}
+		}
+		
+		database.close();
+	}		
+	
+	private void deleteAllClipDatabase(){
+		org.openhds.mobile.clip.database.Database database = new org.openhds.mobile.clip.database.Database(mContext);
+        database.open();
+        
+        database.delete(PregnacyIdentification.class, null, null);
+        
+        database.close();
+	}
+
 }
