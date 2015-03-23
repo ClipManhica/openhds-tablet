@@ -133,6 +133,8 @@ public class OpenHDSProvider extends ContentProvider {
                 OpenHDS.Individuals.COLUMN_INDIVIDUAL_MOTHER);
         individualsProjectionMap.put(OpenHDS.Individuals.COLUMN_INDIVIDUAL_RESIDENCE,
                 OpenHDS.Individuals.COLUMN_INDIVIDUAL_RESIDENCE);
+        individualsProjectionMap.put(OpenHDS.Individuals.COLUMN_RESIDENCE_END_TYPE,
+                OpenHDS.Individuals.COLUMN_RESIDENCE_END_TYPE);
         // special case to display individuals first name and last name on the
         // value fragment
         individualsProjectionMap.put(OpenHDS.Individuals.COLUMN_INDIVIDUAL_FULLNAME,

@@ -249,6 +249,18 @@ public class EventFragment extends Fragment implements OnClickListener {
             pregRegBtn.setEnabled(true);
             birthRegBtn.setEnabled(true);
         }    	
+        
+        if (indiv != null){
+        	String endType = indiv.getEndType();
+        	
+        	if (endType.equals("DTH")){
+        		householdBtn.setEnabled(false);    	
+        		membershipBtn.setEnabled(false);
+            	relationshipBtn.setEnabled(false);
+            	outMigrationBtn.setEnabled(false);
+            	deathBtn.setEnabled(false);
+        	}
+        }
     }
 
     private boolean individualMeetsMinimumAge(Individual indiv) {

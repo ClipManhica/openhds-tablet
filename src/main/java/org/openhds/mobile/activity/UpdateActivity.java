@@ -2025,8 +2025,8 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         stateMachine.transitionTo("Select Event");
         
         if(this.menuItemForm != null) {
-        	this.menuItemForm.setVisible(true);
-        }
+        	this.menuItemForm.setVisible(true && !individual.getEndType().equals("DTH"));
+        }        
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {	
