@@ -53,6 +53,9 @@
           <text id="/out_migration_registration/district:label">
             <value>Distrito</value>
           </text>
+          <text id="/out_migration_registration/name:label">
+            <value>Name</value>
+          </text>
           <text id="/out_migration_registration/maritalChange/REC:label">
             <value>Kupatana</value>
           </text>
@@ -195,6 +198,9 @@
           </text>
           <text id="/out_migration_registration/district:label">
             <value>Distrito</value>
+          </text>
+          <text id="/out_migration_registration/name:label">
+            <value>Nome</value>
           </text>
           <text id="/out_migration_registration/maritalChange/REC:label">
             <value>Reconciliação</value>
@@ -339,6 +345,9 @@
           <text id="/out_migration_registration/district:label">
             <value>Distrito</value>
           </text>
+          <text id="/out_migration_registration/name:label">
+            <value>Name</value>
+          </text>
           <text id="/out_migration_registration/maritalChange/REC:label">
             <value>Reconciliation</value>
           </text>
@@ -443,6 +452,7 @@
           <fieldWorkerId/>
           <individualId/>
           <permId/>
+          <name/>
           <dateOfMigration/>
           <nameOfDestination/>
           <isMozambique/>
@@ -470,6 +480,7 @@
       <bind nodeset="/out_migration_registration/fieldWorkerId" readonly="true()" required="true()" type="string"/>
       <bind nodeset="/out_migration_registration/individualId" readonly="true()" required="true()" type="string"/>
       <bind nodeset="/out_migration_registration/permId" readonly="true()" required="true()" type="string"/>
+      <bind nodeset="/out_migration_registration/name" readonly="true()" type="string"/>
       <bind constraint="(.&lt;=today() and . &gt;date(date('2012-06-01')))" jr:constraintMsg="Date of migration can not be in the future or before the start of the study" nodeset="/out_migration_registration/dateOfMigration" required="true()" type="date"/>
       <bind nodeset="/out_migration_registration/nameOfDestination" required="true()" type="string"/>
       <bind nodeset="/out_migration_registration/isMozambique" required="true()" type="select1"/>
@@ -500,6 +511,9 @@
     </input>
     <input ref="/out_migration_registration/permId">
       <label ref="jr:itext('/out_migration_registration/permId:label')"/>
+    </input>
+    <input ref="/out_migration_registration/name">
+      <label ref="jr:itext('/out_migration_registration/name:label')"/>
     </input>
     <input ref="/out_migration_registration/dateOfMigration">
       <label ref="jr:itext('/out_migration_registration/dateOfMigration:label')"/>

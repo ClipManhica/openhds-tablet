@@ -321,7 +321,7 @@
 	<string name="synced_fws_lbl">Trabalhadores de campo sincronizados.</string>
 	<string name="failed_sync_fws_lbl">Não foi possível sincronizar os trabalhadores de campo.</string>
     
-    
+    <string name="sync_task_clip_pregnancy_ids"> Identificações de Gravidezes.</string>
     
     <string name="hello_lbl">Olá</string>
     <string name="locale_lang">pt</string>
