@@ -634,8 +634,8 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
 
         Individual individual = (Individual) data.getExtras().getSerializable("individual");
         filledForm.setFatherExtId(individual.getExtId());
-        filledForm.setIndividualLastName(individual.getLastName());
-        filledForm.setIndividualMiddleName(individual.getFirstName());
+        //filledForm.setIndividualLastName(individual.getLastName());
+        //filledForm.setIndividualMiddleName(individual.getFirstName());
         loadForm(SELECTED_XFORM);
     }
 
