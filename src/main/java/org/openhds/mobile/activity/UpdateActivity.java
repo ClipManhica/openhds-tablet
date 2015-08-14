@@ -1,5 +1,8 @@
 package org.openhds.mobile.activity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,13 +12,13 @@ import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-
 import org.openhds.mobile.FormsProviderAPI;
 import org.openhds.mobile.InstanceProviderAPI;
 import org.openhds.mobile.OpenHDS;
 import org.openhds.mobile.R;
 import org.openhds.mobile.clip.database.Database.PregnancyId;
 import org.openhds.mobile.clip.model.PregnacyIdentification;
+import org.openhds.mobile.database.BaselineUpdate;
 import org.openhds.mobile.database.DeathOfHoHUpdate;
 import org.openhds.mobile.database.DeathUpdate;
 import org.openhds.mobile.database.ExternalInMigrationUpdate;
@@ -39,6 +42,7 @@ import org.openhds.mobile.model.FieldWorker;
 import org.openhds.mobile.model.FilledForm;
 import org.openhds.mobile.model.Form;
 import org.openhds.mobile.model.FormFiller;
+import org.openhds.mobile.model.FormXmlReader;
 import org.openhds.mobile.model.Individual;
 import org.openhds.mobile.model.Location;
 import org.openhds.mobile.model.LocationHierarchy;
@@ -190,6 +194,8 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
 		stateSequence.add(INMIGRATION);
 	}    
 
+	String unfinishedFormDialogMsg = "";
+	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Cursor curs = Queries.getAllHierarchyLevels(getContentResolver());
@@ -534,6 +540,30 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
             if (cursor.moveToNext()) {
                 String filepath = cursor.getString(cursor
                         .getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
+                
+                FormXmlReader xmlReader = new FormXmlReader();
+            	
+            	//check if is BaselineUpdate            	
+				try {
+					Location location = xmlReader.readLocation(new FileInputStream(new File(filepath)), jrFormId);
+
+					if (location == null) {
+						return false;
+					}
+
+					// check if perm id exists
+					if (Queries.hasLocationByName(resolver, location.getName())) {
+						//Toast.makeText(BaselineActivity.this, "Perm ID da casa já existe,  não será possivel adiciona-lo ao sistema", 5000);
+						unfinishedFormDialogMsg = "Perm ID da casa já existe,  não será possivel adiciona-lo ao sistema";
+						return false;
+					}
+
+				} catch (FileNotFoundException e) {
+					Log.e(BaselineUpdate.class.getName(),"Could not read In Migration XML file");
+				}
+
+            	xmlReader = null;
+                
                 LocationUpdate update = new LocationUpdate();
                 update.updateDatabase(resolver, filepath, jrFormId);
                 cursor.close();
@@ -722,6 +752,54 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
                         .getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
                 try{
 	                if(updatable != null){
+	                	
+	                	FormXmlReader xmlReader = new FormXmlReader();
+	                	Log.d("start-chf", ""+new Date());
+	                	//check if is BaselineUpdate	                	
+	                	if (updatable instanceof ExternalInMigrationUpdate){
+	                		try {
+	                			Individual individual = xmlReader.readInMigration(new FileInputStream(new File(filepath)), jrFormId);
+	                				                			
+	                			if (individual == null) {
+	                            	return false;
+	                        	}
+	                			
+	                			//check if perm id exists
+	                			if (Queries.hasIndividualByPermId(resolver, individual.getLastName())){	                				
+	                				unfinishedFormDialogMsg = "Perm ID do individuo já existe ("+individual.getLastName()+"),  não será possivel adiciona-lo ao sistema";
+	                				return false;
+	                			}	                					
+	                        	
+	                		} catch (FileNotFoundException e) {
+	                            Log.e(BaselineUpdate.class.getName(), "Could not read In Migration XML file");
+	                        }
+	                	}
+	                	
+	                	if (updatable instanceof PregnancyOutcomeUpdate){
+	                		try {
+	                			PregnancyOutcome pregOut = xmlReader.readPregnancyOutcome(new FileInputStream(new File(filepath)), jrFormId);
+
+	                            if (pregOut == null) {
+	                                return false;
+	                            }
+	                			
+	                            for(Individual child : pregOut.getChildren()) {
+	                            	//check if perm id exists
+		                			if (Queries.hasIndividualByPermId(resolver, child.getLastName())){
+		                				//Toast.makeText(BaselineActivity.this, "Perm ID do individuo já existe,  não será possivel adiciona-lo ao sistema", 5000);
+		                				unfinishedFormDialogMsg = "Perm ID do individuo já existe ("+child.getLastName()+"),  não será possivel adiciona-lo ao sistema";
+		                				return false;
+		                			}
+	                            }
+	                				                					
+	                        	
+	                		} catch (FileNotFoundException e) {
+	                            Log.e(BaselineUpdate.class.getName(), "Could not read In Migration XML file");
+	                        }
+	                	}
+	                	
+	                	xmlReader = null;
+	                	
 	                	updatable.updateDatabase(getContentResolver(), filepath, jrFormId);
 	                	updatable = null;
 	                }
@@ -954,7 +1032,13 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         if (xformUnfinishedDialog == null) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle(getString(R.string.warning_lbl));
-            alertDialogBuilder.setMessage(getString(R.string.update_unfinish_msg1));
+            
+            if (unfinishedFormDialogMsg.isEmpty()){
+            	alertDialogBuilder.setMessage(getString(R.string.update_unfinish_msg1));
+            }else {
+            	alertDialogBuilder.setMessage(unfinishedFormDialogMsg + "\n\n" + getString(R.string.update_unfinish_msg1));
+            }
+            
             alertDialogBuilder.setCancelable(true);
             alertDialogBuilder.setPositiveButton(getString(R.string.update_unfinish_pos_button), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
@@ -975,6 +1059,8 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         }
 
         xformUnfinishedDialog.show();
+        
+        unfinishedFormDialogMsg = "";	
     }
 
     private void createXFormNotFoundDialog() {
