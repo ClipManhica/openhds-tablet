@@ -16,8 +16,8 @@ import org.openhds.mobile.FormsProviderAPI;
 import org.openhds.mobile.InstanceProviderAPI;
 import org.openhds.mobile.OpenHDS;
 import org.openhds.mobile.R;
-import org.openhds.mobile.clip.database.Database.PregnancyId;
-import org.openhds.mobile.clip.model.PregnacyIdentification;
+import org.openhds.mobile.clip.database.Database.PregnancyControlTable;
+import org.openhds.mobile.clip.model.PregnancyControl;
 import org.openhds.mobile.database.BaselineUpdate;
 import org.openhds.mobile.database.DeathOfHoHUpdate;
 import org.openhds.mobile.database.DeathUpdate;
@@ -172,7 +172,7 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
 	public static final String INMIGRATION = "Inmigration";
 	private int CREATING_NEW_LOCATION = 0;
 	private int RETURNING_TO_DSS = 0;
-	private PregnacyIdentification currentPregnancyId;
+	private PregnancyControl currentPregnancyId;
 	
 	private static final List<String> stateSequence = new ArrayList<String>();
 //	private static final Map<String, Integer> stateLabels = new HashMap<String, Integer>();
@@ -754,7 +754,7 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
 	                if(updatable != null){
 	                	
 	                	FormXmlReader xmlReader = new FormXmlReader();
-	                	Log.d("start-chf", ""+new Date());
+	                	//Log.d("start-chf", ""+new Date());
 	                	//check if is BaselineUpdate	                	
 	                	if (updatable instanceof ExternalInMigrationUpdate){
 	                		try {
@@ -835,19 +835,40 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
             		db.open();
             		
             		if (currentPregnancyId.getId()==0){
-            			//Save or Insert new Record
+            			//Save or Insert new Record            			
             			db.insert(currentPregnancyId);
             		}else{
             			//Update existing record
-            			db.update(PregnacyIdentification.class, 
+            			readFormEnSave(jrFormId, currentPregnancyId);
+            			db.update(PregnancyControl.class, 
           					  currentPregnancyId.getContentValues(), 
-          					  org.openhds.mobile.clip.database.Database.PregnancyId.COLUMN_INDIVIDUAL_ID+" = ?",
-          					  new String[] { currentPregnancyId.getIndividualId() });
+          					  org.openhds.mobile.clip.database.Database.PregnancyControlTable.COLUMN_PERM_ID+" = ?",
+          					  new String[] { currentPregnancyId.getPermId() });
             		}
             		
             		currentPregnancyId = null;
             		db.close();
             	}
+            	
+            	if (jrFormId.equals("Form_E") && currentPregnancyId != null){
+            		//Save or Update
+            		org.openhds.mobile.clip.database.Database db = new org.openhds.mobile.clip.database.Database(UpdateActivity.this);
+            		db.open();
+            		
+            	
+            		//Update existing record
+            		readFormEnSave(jrFormId, currentPregnancyId);
+            		
+            		db.update(PregnancyControl.class, 
+          					  currentPregnancyId.getContentValues(), 
+          					  org.openhds.mobile.clip.database.Database.PregnancyControlTable.COLUMN_PERM_ID+" = ?",
+          					  new String[] { currentPregnancyId.getPermId() });
+            		            		
+            		currentPregnancyId = null;
+            		db.close();
+            	}
+            	
+            	// Log.d("state-machine", ""+stateMachine.getState());
             	
             	if (stateMachine.getState()=="Inmigration") {
             		stateMachine.transitionTo("Select Event");
@@ -863,6 +884,10 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
             		else if(deathCreation){            			
             			onClearIndividual();
             		}
+            		if (jrFormId.equals("Form_E") || jrFormId.equals("Form_D")){
+            			//Log.d("select-form-d", "form-e e form-d selectind");
+            			selectIndividual();
+            		}
             	}else {
             		stateMachine.transitionTo("Select Individual");
             	}
@@ -875,6 +900,27 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
     		deathCreation = false;
     		extInm = false;
         }
+
+		private void readFormEnSave(String jrFormId, PregnancyControl pregnancyControl) {
+			Cursor cursor = resolver.query(contentUri, new String[] { InstanceProviderAPI.InstanceColumns.STATUS,
+                    InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH },
+                    InstanceProviderAPI.InstanceColumns.STATUS + "=?",
+                    new String[] { InstanceProviderAPI.STATUS_COMPLETE }, null);
+			
+			Log.d("trying-to-save-prid", "cursor-count="+cursor.getCount());
+			
+            if (cursor.moveToNext()) {
+                String filepath = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));               
+             	           		         
+	           	try {
+	           		FormXmlReader xmlReader = new FormXmlReader();
+	            	xmlReader.readFormEtoPregnancyControl(new FileInputStream(new File(filepath)), jrFormId, pregnancyControl);
+	            }catch(FileNotFoundException e) {
+                    Log.e("FormE-save-to-PregnancyControl", "Could not read In Migration XML file");
+                }
+	            
+            }
+		}
     }
     
 	private void onFinishedHouseHoldCreation() {
@@ -1391,104 +1437,103 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         new CreateFormDTask().execute(); 
     }
     
-    private class CreateFormDTask extends AsyncTask<Void, Void, Void> {
+    private class CreateFormDTask extends AsyncTask<Void, Void, Boolean> {
 
         @Override
-        protected Void doInBackground(Void... params) {
-            filledForm = fillFormD();            
-            return null;
-        }
-        
-        private FilledForm fillFormD(){
-        	        	
+        protected Boolean doInBackground(Void... params) {
+            
         	ContentResolver resolver = UpdateActivity.this.getContentResolver();
-        	        	        	        	
-        	FilledForm ffm = formFiller.fillExtraForm(locationVisit, "Form_D", null);
         	
-        	PregnacyIdentification pregId = null;
-        	String individualId = ffm.getIndividualExtId();
-        	String permId = ffm.getIndividualLastName();
+        	filledForm = formFiller.fillExtraForm(locationVisit, "Form_D", null);
+        	
+        	PregnancyControl pregId = null;
+        	String individualId = filledForm.getIndividualExtId();
+        	String permId = filledForm.getIndividualLastName();
         	String pregnancyId = "";    
         	int count = 0;
         	
-        	org.openhds.mobile.clip.database.Database db = new org.openhds.mobile.clip.database.Database(UpdateActivity.this);
-    		db.open();
-    		
-    		Cursor cursor = db.query(PregnacyIdentification.class, PregnancyId.COLUMN_INDIVIDUAL_ID + " = ?", new String[] { individualId }, null, null, null);
-    		
-    		if (cursor != null && cursor.moveToFirst()){ //If already exists a pregnancy_id
+        	pregId = locationVisit.getLastPregnancyControl(UpdateActivity.this, permId);
+        	
+        	if (pregId != null){ //If already exists a pregnancy_id
     			
-    			//Create the pregnancy_id based on the last created
-    			pregId = org.openhds.mobile.clip.database.Converter.cursorToPregnacyIdentification(cursor);
+    			//Create the pregnancy_id based on the last created    			    			    			
+    			String countStr = pregId.getPregnancyId().substring(pregId.getPregnancyId().length()-2);
+    			count = Integer.parseInt(countStr)+1;
+    			    			
+    			pregnancyId = permId + "-" + String.format("%02d", count);
     			
-    			count = pregId.getCount() + 1;
-    			pregnancyId = permId + "-" + String.format("%02d", count); 
+    			//verify if pregnancy has outcomes
+    			if (pregId.hasDelivered()==0){
+    				filledForm.setPregnancyId(pregId.getPregnancyId());
+    				return false;
+    			}
     			
-    			pregId.setPregnancyId(pregnancyId);
-    			pregId.setCount(count);
-    		
-    		}else{
-    			
+    			pregId.setPregnancyId(pregnancyId);    			
+    		}else{    			
     			//Create the first pregnancy_id
     			pregnancyId = permId + "-" + "01";     			
-    			pregId = new PregnacyIdentification(individualId, permId, pregnancyId, 1);
-    			    			
+    			pregId = new PregnancyControl(individualId, permId, pregnancyId, "", "", 0, 0, 0, 0);    			    			
     		}    		
     		
-    		if (cursor != null) cursor.close();
-    		db.close();
-        	    		    		
-    		ffm.setPregnancyId(pregnancyId);
-    		
-    		currentPregnancyId = pregId;
-        	
-        	return ffm;
-        }
-
+    		        	    		    		
+    		filledForm.setPregnancyId(pregnancyId);    		
+    		currentPregnancyId = pregId;            
+            
+            return true;
+        }       
+      
         @Override
-        protected void onPostExecute(Void result) {
-            hideProgressFragment();
-            loadForm(SELECTED_XFORM);
+        protected void onPostExecute(Boolean result) {
+        	if (result){    
+        		hideProgressFragment();
+        		loadForm(SELECTED_XFORM);
+        	}else{
+        		hideProgressFragment();
+        		createPregnacyWithoutOutcomes();
+        	}
         }
+    }
+    
+    private void createPregnacyWithoutOutcomes() {
+        
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+          alertDialogBuilder.setTitle("Formulário D - Não é possivel processar nova gravidez");
+          alertDialogBuilder.setMessage("A mulher selecionada não  possui resultado da sua ultima gravidez (Form E)!\nExecute primeiro o resultado da gravidez para poder criar uma nova!");
+          alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {  
+            	//selectIndividual();
+            	//stateMachine.transitionTo("Select Individual");
+            	//restoreState();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show(); 
     }
     
     private class CreateFormETask extends AsyncTask<Void, Void, Boolean> {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-                    	        	
-        	ContentResolver resolver = UpdateActivity.this.getContentResolver();
-        	
+          
         	filledForm = formFiller.fillExtraForm(locationVisit, "Form_E", null);
         	
         	String individualId = filledForm.getIndividualExtId();
         	String permId = filledForm.getIndividualLastName();
         	String pregnancyId = "";    
         	        	
-        	org.openhds.mobile.clip.database.Database db = new org.openhds.mobile.clip.database.Database(UpdateActivity.this);
-    		db.open();
-    		
-    		Cursor cursor = db.query(PregnacyIdentification.class, PregnancyId.COLUMN_INDIVIDUAL_ID + " = ?", new String[] { individualId }, null, null, null);
-    		
-    		if (cursor != null && cursor.moveToFirst()){ //If already exists a pregnancy_id
-    			
-    			//Use the last pregnancy_id created
-    			PregnacyIdentification pregId = org.openhds.mobile.clip.database.Converter.cursorToPregnacyIdentification(cursor);    			    			
+        	PregnancyControl pregId = locationVisit.getLastPregnancyControl(UpdateActivity.this, permId);
+        	
+    		if (pregId != null){    			
+    			//Use the last pregnancy_id created    						    			
     			pregnancyId = pregId.getPregnancyId();    			
-    		}else{
-    			
+    		}else{    			
     			//Doesnt exists pregnancyId
     			//There's no pregnancy registration for this woman    			
     			return false;
-    		}    		
-    		
-    		
-    		if (cursor != null) cursor.close();
-    		db.close();
-        	
+    		}    	
     		
     		filledForm.setPregnancyId(pregnancyId);    		
-        	
+        	currentPregnancyId = pregId;
         	
             return true;
         }
@@ -1519,6 +1564,8 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show(); 
+        
+        currentPregnancyId = null;
     }
 
     private class CreatePregnancyObservationTask extends AsyncTask<Void, Void, Void> {

@@ -13,10 +13,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.openhds.mobile.clip.model.PregnancyControl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import android.util.Log;
 
 
 public class FormXmlReader {
@@ -328,4 +331,49 @@ public class FormXmlReader {
         return null;
     }    
 
+    public void readFormEtoPregnancyControl(FileInputStream fileInputStream, String jrFormId, PregnancyControl pregnancyControl)  {
+        try {
+            Document doc = buildDocument(fileInputStream);
+            if(xpath.evaluate("/"+jrFormId+"/visitId/text()", doc).length()==0) {
+            	jrFormId ="data";
+            }
+        
+            String pregStAtDth = null;
+            String pregStNow = null;
+            String birthDate = null;
+            
+            if(xpath.evaluate("/"+jrFormId+"/main/women/pregStatusNow/text()", doc).length()>0) {
+            	pregStNow = xpath.evaluate("/"+jrFormId+"/main/women/pregStatusNow/text()", doc);
+            }
+            
+            if(xpath.evaluate("/"+jrFormId+"/main/women/pregStatusAtDeath/text()", doc).length()>0) {
+            	pregStAtDth = xpath.evaluate("/"+jrFormId+"/main/women/pregStatusAtDeath/text()", doc);
+            }
+            
+            if(xpath.evaluate("/"+jrFormId+"/main/birthinfo/birthDate/text()", doc).length()>0) {
+            	birthDate = xpath.evaluate("/"+jrFormId+"/main/birthinfo/birthDate/text()", doc);
+            }
+            
+            //Log.d("read1", ""+xpath.evaluate("/"+jrFormId+"/main/women/pregStatusNow/text()", doc));
+            //Log.d("read2", ""+xpath.evaluate("/"+jrFormId+"/main/women/pregStatusAtDeath/text()", doc));
+            //Log.d("read3", ""+xpath.evaluate("/"+jrFormId+"/main/birthinfo/birthDate/text()", doc));
+            
+            Log.d("pregstatnow", ""+pregStNow);
+            Log.d("pregstatdth", ""+pregStAtDth);
+            Log.d("birthdate", ""+birthDate);
+                                  
+            
+            boolean hasDelivered = (pregStNow != null) ? (pregStNow.equals("2")) : ((pregStAtDth != null) ? (pregStAtDth.equals("2")) : false);
+            
+            pregnancyControl.setHasDelivered( hasDelivered ? 1 : 0 );            
+            pregnancyControl.setAntepartumVisits( !hasDelivered ? pregnancyControl.getAntepartumVisits()+1 : pregnancyControl.getAntepartumVisits() );
+            pregnancyControl.setPostpartumVisits(  hasDelivered ? pregnancyControl.getPostpartumVisits()+1 : pregnancyControl.getPostpartumVisits() );
+            
+        } catch (ParserConfigurationException e) {
+        } catch (SAXException e) {
+        } catch (IOException e) {
+        } catch (XPathExpressionException e) {
+        }
+    }
+    
 }

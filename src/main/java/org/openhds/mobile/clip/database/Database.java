@@ -26,6 +26,25 @@ public class Database {
 		public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_INDIVIDUAL_ID, COLUMN_PERM_ID, COLUMN_PREGNANCY_ID, COLUMN_COUNT};
 	}
 	
+	public static final class PregnancyControlTable implements BaseColumns {
+		public static final String TABLE_NAME = "pregnancy_control";
+		
+		public static final String COLUMN_ID = "id";
+		public static final String COLUMN_INDIVIDUAL_ID = "individualId";
+		public static final String COLUMN_PERM_ID = "permId";
+		public static final String COLUMN_PREGNANCY_ID = "pregnancyId";
+		public static final String COLUMN_ESTIMATED_DOB = "estimatedDob";
+		public static final String COLUMN_DATE_OF_BIRTH = "dateOfBirth";
+		public static final String COLUMN_HAS_DELIVERED = "hasDelivered";
+		public static final String COLUMN_VISIT_NUMBER = "visitNumber";
+		public static final String COLUMN_ANTEPARTUM_VISITS = "antepartumVisits";
+		public static final String COLUMN_POSTPARTUM_VISITS = "postpartumVisits";
+		
+		public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_INDIVIDUAL_ID, COLUMN_PERM_ID, COLUMN_PREGNANCY_ID, 
+													COLUMN_ESTIMATED_DOB, COLUMN_DATE_OF_BIRTH, COLUMN_HAS_DELIVERED, COLUMN_VISIT_NUMBER,
+													COLUMN_ANTEPARTUM_VISITS, COLUMN_POSTPARTUM_VISITS};
+		}
+	
 	private DatabaseHelper dbHelper;
 	private SQLiteDatabase database;
 	

@@ -323,6 +323,14 @@
     
     <string name="sync_task_clip_pregnancy_ids"> Identificações de Gravidezes.</string>
     
+    <string name="individual_pregnancy_id_lbl"     >Clip Id:</string>
+	<string name="individual_pregnancy_dob_lbl"    >Data do parto:</string>
+	<string name="individual_estimated_dob_lbl"    >Data Estimada:</string>
+	<string name="individual_hasDelivered_lbl"     >Já deu parto:</string>
+	<string name="individual_visit_number_lbl"     >N. de visitas:</string>
+	<string name="individual_antepartum_visits_lbl">V. de A.parto:</string>
+	<string name="individual_postpartum_visits_lbl">V. de P.parto:</string>
+    
     <string name="hello_lbl">Olá</string>
     <string name="locale_lang">pt</string>
 

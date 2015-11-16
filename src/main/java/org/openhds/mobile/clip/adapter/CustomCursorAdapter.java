@@ -53,7 +53,7 @@ public class CustomCursorAdapter extends SimpleCursorAdapter {
 			LinearLayout textLayout = (LinearLayout) linear.getChildAt(1);
 			
 			//view.get
-			Log.d("view", textLayout+"");			
+			//Log.d("view", textLayout+"");			
 			
 			TextView text1 = (TextView) textLayout.getChildAt(0);
 	        TextView text2 = (TextView) textLayout.getChildAt(1);

@@ -358,7 +358,7 @@
 	        android:layout_marginLeft="10dp"
 	        android:text="Select Individual" />
 	    
-		      <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	           android:layout_width="fill_parent"
 	           android:layout_height="wrap_content">  
 	        <TableRow> 
@@ -411,7 +411,8 @@
 			        android:layout_marginLeft="5dp"
 			        android:inputType="text"
 			        android:textAppearance="?android:attr/textAppearanceSmall"  />
-	    	</TableRow> 
+	    	</TableRow>
+	    	
 	    	<TableRow>
 	            <TextView
 			        android:id="@+id/individualDob"
@@ -428,6 +429,148 @@
 			        android:layout_marginLeft="5dp"
 			        android:paddingBottom="5dp"
 			        android:inputType="text"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+	    	</TableRow> 
+	    	
+	    	<TableRow>
+	            <TextView
+			        android:id="@+id/individualPregnancyId"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:text="@string/individual_pregnancy_id_lbl"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+		    
+		     	<TextView
+		     	    android:id="@+id/individualPregnancyIdText"
+		     	    android:layout_width="wrap_content"
+		     	    android:layout_height="wrap_content"
+		     	    android:layout_marginLeft="5dp"
+		     	    android:inputType="text"
+		     	    android:paddingBottom="5dp"
+		     	    android:textAppearance="?android:attr/textAppearanceSmall"
+		     	    android:textColor="#0ff800" />
+
+	    	</TableRow> 
+	    	
+	    	<TableRow>
+	            <TextView
+			        android:id="@+id/individualHasDelivered"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:text="@string/individual_hasDelivered_lbl"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+		    
+		     	<TextView
+			        android:id="@+id/individualHasDeliveredText"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:paddingBottom="5dp"
+			        android:inputType="text"
+			        android:textColor="#0ff800"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+	    	</TableRow> 
+	    	
+	    	<TableRow>
+	            <TextView
+			        android:id="@+id/individualPregnancyDob"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:text="@string/individual_pregnancy_dob_lbl"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+		    
+		     	<TextView
+			        android:id="@+id/individualPregnancyDobText"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:paddingBottom="5dp"
+			        android:inputType="text"
+			        android:textColor="#0ff800"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+	    	</TableRow> 
+	    
+	    	<TableRow>
+	            <TextView
+			        android:id="@+id/individualEstDob"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:text="@string/individual_estimated_dob_lbl"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+		    
+		     	<TextView
+			        android:id="@+id/individualEstDobText"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:paddingBottom="5dp"
+			        android:inputType="text"
+			        android:textColor="#0ff800"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+	    	</TableRow>    	
+	    	
+	    	    		    
+	    	<TableRow>
+	            <TextView
+			        android:id="@+id/individualVisitNumber"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:text="@string/individual_visit_number_lbl"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+		    
+		     	<TextView
+			        android:id="@+id/individualVisitNumberText"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:paddingBottom="5dp"
+			        android:inputType="text"
+			        android:textColor="#0ff800"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+	    	</TableRow> 
+	    
+	    	<TableRow>
+	            <TextView
+			        android:id="@+id/individualAntepartumVisits"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:text="@string/individual_antepartum_visits_lbl"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+		    
+		     	<TextView
+			        android:id="@+id/individualAntepartumVisitsText"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:paddingBottom="5dp"
+			        android:inputType="text"
+			        android:textColor="#0ff800"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+	    	</TableRow> 
+	    
+	    	<TableRow>
+	            <TextView
+			        android:id="@+id/individualPostpartumVisits"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:text="@string/individual_postpartum_visits_lbl"
+			        android:textAppearance="?android:attr/textAppearanceSmall"  />
+		    
+		     	<TextView
+			        android:id="@+id/individualPostpartumVisitsText"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="5dp"
+			        android:paddingBottom="5dp"
+			        android:inputType="text"
+			        android:textColor="#0ff800"
 			        android:textAppearance="?android:attr/textAppearanceSmall"  />
 	    	</TableRow> 
 		</TableLayout>

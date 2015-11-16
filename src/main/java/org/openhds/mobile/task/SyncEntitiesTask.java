@@ -24,7 +24,9 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.openhds.mobile.OpenHDS;
 import org.openhds.mobile.R;
+import org.openhds.mobile.clip.database.Database.PregnancyControlTable;
 import org.openhds.mobile.clip.model.PregnacyIdentification;
+import org.openhds.mobile.clip.model.PregnancyControl;
 import org.openhds.mobile.listener.SyncDatabaseListener;
 import org.openhds.mobile.model.Settings;
 import org.xmlpull.v1.XmlPullParser;
@@ -159,7 +161,7 @@ public class SyncEntitiesTask extends
 		// at this point, we don't care to be smart about which data to
 		// download, we simply download it all
 		deleteAllTables();
-		
+		//deleteAllClipDatabase();
 		try {
 			
 			entity = Entity.LOCATION_HIERARCHY;
@@ -190,8 +192,9 @@ public class SyncEntitiesTask extends
 			processUrl(baseurl + API_PATH + "/settings");
 			
 			entity = Entity.PREGNANCY_IDS;
-			processUrl("http://sap.manhica.net:4700/files/clip/pregnancy_ids.xml");
+			processUrl("http://sap.manhica.net:4700/files/clip/pregnancy_control.xml"); //changing to control
 		} catch (Exception e) {
+			e.printStackTrace();
 			return HttpTask.EndResult.FAILURE;
 		}
 
@@ -288,6 +291,8 @@ public class SyncEntitiesTask extends
 					processSettingsParams(parser);
 				} else if(name.equalsIgnoreCase("pregnaciesIdenfications")) {
 					processPregnancyIdsParams(parser);
+				} else if(name.equalsIgnoreCase("pregnanciesControl")) {
+					processPregnancyControlParams(parser);
 				}
 				break;
 			}
@@ -872,11 +877,101 @@ public class SyncEntitiesTask extends
 		database.close();
 	}		
 	
+	private void processPregnancyControlParams(XmlPullParser parser) throws XmlPullParserException, IOException {
+		
+		org.openhds.mobile.clip.database.Database database = new org.openhds.mobile.clip.database.Database(mContext);
+        database.open();
+		
+        values.clear();
+		
+		int count = 0;
+		List<PregnancyControl> valuesTb = new ArrayList<PregnancyControl>();
+		
+		Log.d("executing", "pregnancy control xml");
+        
+		parser.nextTag();
+		
+		while (notEndOfXmlDoc("pregnanciesControl", parser)) {
+			count++;
+						
+			PregnancyControl pregnancyControl = new PregnancyControl();
+			
+			parser.nextTag(); //individualId
+			pregnancyControl.setIndividualId(parser.nextText());
+			
+			//Log.d("individualId", parser.nextText());
+			
+			parser.nextTag(); //permId						
+			pregnancyControl.setPermId(parser.nextText());
+			
+			//Log.d("permId", parser.nextText());
+			
+			parser.nextTag(); //pregnancyId
+			pregnancyControl.setPregnancyId(parser.nextText());
+			
+			//Log.d("pregnancyId", parser.nextText());
+			
+			parser.nextTag(); //hasDelivered
+			pregnancyControl.setHasDelivered(parser.nextText().equalsIgnoreCase("true")? 1 : 0);
+			
+			//Log.d("hasDelivered", parser.nextText());
+			
+			parser.nextTag(); //visitNumber
+			pregnancyControl.setHasDelivered(Integer.parseInt(parser.nextText()));
+			
+			//Log.d("visitNumber", parser.nextText());
+			
+			parser.nextTag(); //antepartumVisits
+			pregnancyControl.setAntepartumVisits(Integer.parseInt(parser.nextText()));
+			
+			//Log.d("antepartumVisits", parser.nextText());
+			
+			parser.nextTag(); //postpartumVisits
+			pregnancyControl.setPostpartumVisits(Integer.parseInt(parser.nextText()));
+			
+			//Log.d("postpartumVisits", parser.nextText());
+			
+			parser.nextTag(); //dob
+			pregnancyControl.setDateOfBirth(parser.nextText());
+			
+			//Log.d("dob", parser.nextText());
+			
+			parser.nextTag(); //estDob
+			pregnancyControl.setEstimatedDob(parser.nextText());
+			
+			//Log.d("estDob", parser.nextText());
+						
+			valuesTb.add(pregnancyControl);
+			
+			publishProgress(count);
+
+			parser.nextTag(); // </pregnancyIdentification>
+			parser.nextTag(); // <pregnancyIdentification>			
+			
+		}
+		
+		state = State.SAVING;
+		entity = Entity.PREGNANCY_IDS;
+		
+		if (!valuesTb.isEmpty()) {
+			count = 0;
+			for (PregnancyControl p : valuesTb){
+				count++;
+				database.insert(p);
+				publishProgress(count);
+			}
+		}
+		
+		database.close();
+	}		
+	
+	
 	private void deleteAllClipDatabase(){
 		org.openhds.mobile.clip.database.Database database = new org.openhds.mobile.clip.database.Database(mContext);
         database.open();
         
         database.delete(PregnacyIdentification.class, null, null);
+        database.delete(PregnancyControl.class, null, null);
         
         database.close();
 	}

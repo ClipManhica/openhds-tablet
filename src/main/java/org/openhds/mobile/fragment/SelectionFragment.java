@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openhds.mobile.R;
+import org.openhds.mobile.clip.database.Database.PregnancyControlTable;
+import org.openhds.mobile.clip.model.PregnancyControl;
 import org.openhds.mobile.database.queries.Converter;
 import org.openhds.mobile.database.queries.Queries;
 import org.openhds.mobile.model.Individual;
@@ -20,6 +22,7 @@ import android.app.Fragment;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -76,7 +79,9 @@ public class SelectionFragment extends Fragment implements OnClickListener {
             hierarchy5LabelExtIdText, hierarchy6LabelExtIdText, hierarchy7LabelExtIdText, hierarchy8LabelExtIdText,
             roundNumberText, roundStartDateText, roundEndDateText, locationNameText, locationExtIdText,
             locationLatitudeText, locationLongitudeText, individualFirstNameText, individualLastNameText,
-            individualExtIdText, individualDobText;
+            individualExtIdText, individualDobText,  individualPregnancyIdText, individualPregnancyDobText,
+            individualEstDobText, individualHasDeliveredText, individualVisitNumberText, individualAntepartumVisitsText,
+            individualPostpartumVisitsText;
 
     @Override
     public void onAttach(Activity activity) {
@@ -218,6 +223,15 @@ public class SelectionFragment extends Fragment implements OnClickListener {
         individualFirstNameText = (TextView) view.findViewById(R.id.individualFirstNameText);
         individualLastNameText = (TextView) view.findViewById(R.id.individualLastNameText);
         individualDobText = (TextView) view.findViewById(R.id.individualDobText);
+        
+        individualPregnancyIdText = (TextView) view.findViewById(R.id.individualPregnancyIdText);
+        individualPregnancyDobText = (TextView) view.findViewById(R.id.individualPregnancyDobText);
+        individualEstDobText = (TextView) view.findViewById(R.id.individualEstDobText);
+        individualHasDeliveredText = (TextView) view.findViewById(R.id.individualHasDeliveredText);
+        individualVisitNumberText = (TextView) view.findViewById(R.id.individualVisitNumberText);
+        individualAntepartumVisitsText = (TextView) view.findViewById(R.id.individualAntepartumVisitsText);
+        individualPostpartumVisitsText = (TextView) view.findViewById(R.id.individualPostpartumVisitsText);
+        
         
         hierarchyButtons = new ArrayList<Button>();
         hierarchyButtons.add(hierarchy1Btn);
@@ -754,6 +768,36 @@ public class SelectionFragment extends Fragment implements OnClickListener {
         individualLastNameText.setText(selectedIndividual.getLastName());
         individualExtIdText.setText(selectedIndividual.getExtId());
         individualDobText.setText(selectedIndividual.getDob());
+        
+        individualPregnancyIdText.setText("");
+        individualPregnancyDobText.setText("");
+        individualEstDobText.setText("");
+        individualHasDeliveredText.setText("");
+        individualVisitNumberText.setText("");
+        individualAntepartumVisitsText.setText("");
+        individualPostpartumVisitsText.setText("");
+        
+        Log.d("gender", ""+selectedIndividual.getGender());
+        
+        if (selectedIndividual.getGender() != null && selectedIndividual.getGender().equals("F")){
+        	
+        	PregnancyControl pregId = locationVisit.getLastPregnancyControl(getActivity(), selectedIndividual);
+        	
+        	Log.d("select preg", ""+pregId);
+        	
+    		if (pregId != null){ //If already exists a pregnancy_id
+    			
+    			//Create the pregnancy_id based on the last created
+    			
+    			individualPregnancyIdText.setText(pregId.getPregnancyId());
+    			individualPregnancyDobText.setText(pregId.getDateOfBirth());
+    	        individualEstDobText.setText(pregId.getEstimatedDob());
+    	        individualHasDeliveredText.setText(pregId.hasDelivered()==1 ? "Sim" : "Não");
+    	        individualVisitNumberText.setText(pregId.getVisitNumber()+"");
+    	        individualAntepartumVisitsText.setText(pregId.getAntepartumVisits()+"");
+    	        individualPostpartumVisitsText.setText(pregId.getPostpartumVisits()+"");
+    		}
+        }
     }
 
     private void setLocation() {
