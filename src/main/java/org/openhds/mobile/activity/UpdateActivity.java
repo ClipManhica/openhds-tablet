@@ -172,6 +172,7 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
 	public static final String INMIGRATION = "Inmigration";
 	private int CREATING_NEW_LOCATION = 0;
 	private int RETURNING_TO_DSS = 0;
+	private int CREATING_MEMBERSHIP = 0;
 	private PregnancyControl currentPregnancyId;
 	
 	private static final List<String> stateSequence = new ArrayList<String>();
@@ -583,11 +584,12 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
             	if(locationExtId.length() > 0){
             		vf.loadFilteredLocationById(locationExtId);
             		vf.selectItemNoInList(0);
-            		CREATING_NEW_LOCATION = 1;
-            		onCreateVisit();
+            		CREATING_NEW_LOCATION = 1;            		
+            		//onCreateVisit();            		
             	}
             } else {
                 createUnfinishedFormDialog();
+                CREATING_NEW_LOCATION = 0;
             }            
         }
     }
@@ -928,7 +930,14 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         alertDialogBuilder.setTitle(getString(R.string.householdBtn_lbl));
         alertDialogBuilder.setMessage(getString(R.string.finish_household_creation_msg));
         alertDialogBuilder.setCancelable(true);
-        alertDialogBuilder.setPositiveButton("Ok", null);
+        alertDialogBuilder.setPositiveButton("Ok",  new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int which) {
+        	    if (CREATING_MEMBERSHIP == 1){        	    	
+        	    	//onMembership();
+        	    	CREATING_MEMBERSHIP = 0;
+        	    }        		
+        	}
+        });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();		
                 
@@ -1255,6 +1264,8 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         filledForm = formFiller.fillMembershipForm(locationVisit);
         updatable = new MembershipUpdate();
 //        showProgressFragment();
+        CREATING_MEMBERSHIP = 1;
+        
         getLoaderManager().restartLoader(SOCIAL_GROUP_AT_LOCATION, null, this);
     }
 
@@ -1341,7 +1352,11 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         alertDialogBuilder.setTitle(getString(R.string.in_migration_lbl));
         alertDialogBuilder.setMessage(getString(R.string.update_finish_ext_inmigration_msg));
         alertDialogBuilder.setCancelable(true);
-        alertDialogBuilder.setPositiveButton("Ok", null);
+        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                //onMembership();
+            }
+        });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();		
         extInm= false;
@@ -1701,17 +1716,25 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
     private class CreateDeathTask extends AsyncTask<Void, Void, Void> {
 
     	private SocialGroup sg;
+    	private int nrMembers;
     	
         @Override
         protected Void doInBackground(Void... params) {
         	ContentResolver resolver = getContentResolver();
         	Cursor cursor = Queries.getSocialGroupsByIndividualExtId(resolver,locationVisit.getSelectedIndividual().getExtId());
+        	
+        	Cursor cursorIndividuals = Queries.getIndividualsByResidency(resolver, locationVisit.getLocation().getExtId());
+        	nrMembers = cursorIndividuals.getCount();
+        	cursorIndividuals.close();
+        	
+        	Log.d("number of deaths", ""+nrMembers);
+        	
         	if (cursor.moveToFirst()) {
         		SocialGroup socialGroup = Converter.convertToSocialGroup(cursor);
         		this.sg = socialGroup;
         		locationVisit.getLocation().setHead(sg.getGroupHead());
         	}
-            filledForm = formFiller.fillDeathForm(locationVisit, sg);
+            filledForm = formFiller.fillDeathForm(locationVisit, sg, nrMembers);
             
             updatable = new DeathUpdate();
             cursor.close();
@@ -1723,7 +1746,7 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
         	hideProgressFragment();
         	if(this.sg != null){
         		deathCreation = true;
-        		if(locationVisit.getSelectedIndividual().getExtId().equalsIgnoreCase(locationVisit.getLocation().getHead())){
+        		if(locationVisit.getSelectedIndividual().getExtId().equalsIgnoreCase(locationVisit.getLocation().getHead()) && nrMembers>1){
 	    			updatable = new DeathOfHoHUpdate();
 	    	        Bundle bundle = new Bundle();
 	    	        bundle.putString("sg", sg.getExtId());
@@ -2303,12 +2326,17 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
             	ContentResolver resolver = getContentResolver();
             	Cursor c_cursor = Queries.getSocialGroupsByIndividualExtId(resolver,locationVisit.getSelectedIndividual().getExtId());
             	SocialGroup socialGroup = null;
+            	
+            	Cursor cursorIndividuals = Queries.getIndividualsByResidency(resolver, locationVisit.getLocation().getExtId());
+            	int nrMembers = cursorIndividuals.getCount();
+            	cursorIndividuals.close();
+            	
             	if (c_cursor.moveToFirst()) {
             		socialGroup = Converter.convertToSocialGroup(c_cursor);
             		locationVisit.getLocation().setHead(socialGroup.getGroupHead());
             	}
             	
-                filledForm = formFiller.fillDeathForm(locationVisit, socialGroup);    
+                filledForm = formFiller.fillDeathForm(locationVisit, socialGroup, nrMembers);    
                 updatable = new DeathUpdate();
                 c_cursor.close();
                 
@@ -2450,6 +2478,7 @@ public class UpdateActivity extends Activity implements ValueFragment.ValueListe
 					// if this button is clicked, just close
 					// the dialog box and do nothing
 					dialog.cancel();
+					CREATING_MEMBERSHIP = 0;
 				}
 			});   	
 	    	builder.setPositiveButton(getString(R.string.create_lbl), new DialogInterface.OnClickListener() {

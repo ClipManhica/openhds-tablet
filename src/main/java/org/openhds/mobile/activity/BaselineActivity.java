@@ -1282,7 +1282,7 @@ EventFragment.Listener, SelectionFragment.Listener, ValueFragment.OnlyOneEntryLi
         	sg = Converter.convertToSocialGroup(cursor);
         	locationVisit.getLocation().setHead(sg.getGroupHead());
         	}
-            filledForm = formFiller.fillDeathForm(locationVisit, sg);
+            filledForm = formFiller.fillDeathForm(locationVisit, sg, 0);
             
             updatable = new DeathUpdate();
             cursor.close();
