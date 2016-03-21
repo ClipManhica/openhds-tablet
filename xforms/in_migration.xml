@@ -96,7 +96,7 @@
             <value>Partial Date</value>
           </text>
           <text id="/in_migration/individualInfo/lastName:label">
-            <value>Jina la Ukoo</value>
+            <value>Perm ID</value>
           </text>
           <text id="/in_migration/individualInfo/middleName:label">
             <value>Jina la Kati</value>
@@ -284,7 +284,7 @@
             <value>Data parcial</value>
           </text>
           <text id="/in_migration/individualInfo/lastName:label">
-            <value>Apelido</value>
+            <value>Perm ID</value>
           </text>
           <text id="/in_migration/individualInfo/middleName:label">
             <value>Nome do meio</value>
@@ -469,7 +469,7 @@
             <value>Partial Date</value>
           </text>
           <text id="/in_migration/individualInfo/lastName:label">
-            <value>Last Name</value>
+            <value>Perm ID</value>
           </text>
           <text id="/in_migration/individualInfo/middleName:label">
             <value>Middle Name</value>
@@ -572,12 +572,12 @@
           <locationName/>
           <individualInfo>
             <individualId/>
-            <permId/>
+            <lastName/>
             <motherId/>
             <fatherId/>
             <firstName/>
             <middleName/>
-            <lastName/>
+            <permId/>
             <gender/>
             <dateOfBirth/>
             <partialDate/>
@@ -613,12 +613,12 @@
       <bind nodeset="/in_migration/locationId" readonly="true()" required="true()" type="string"/>
       <bind nodeset="/in_migration/locationName" readonly="true()" type="string"/>
       <bind nodeset="/in_migration/individualInfo/individualId" readonly="true()" required="true()" type="string"/>
-      <bind nodeset="/in_migration/individualInfo/permId" readonly="true()" type="string"/>
+      <bind nodeset="/in_migration/individualInfo/lastName" readonly="true()" required="true()" type="string"/>
       <bind nodeset="/in_migration/individualInfo/motherId" readonly="true()" relevant=" /in_migration/migrationType  = 'EXTERNAL_INMIGRATION'" required="true()" type="string"/>
       <bind nodeset="/in_migration/individualInfo/fatherId" readonly="true()" relevant=" /in_migration/migrationType  = 'EXTERNAL_INMIGRATION'" required="true()" type="string"/>
       <bind nodeset="/in_migration/individualInfo/firstName" relevant=" /in_migration/migrationType  = 'EXTERNAL_INMIGRATION'" required="true()" type="string"/>
       <bind nodeset="/in_migration/individualInfo/middleName" relevant="1=0 and  /in_migration/migrationType  = 'EXTERNAL_INMIGRATION'" type="string"/>
-      <bind nodeset="/in_migration/individualInfo/lastName" relevant="1=0 and  /in_migration/migrationType  = 'EXTERNAL_INMIGRATION'" required="true()" type="string"/>
+      <bind calculate=" /in_migration/individualInfo/lastName " nodeset="/in_migration/individualInfo/permId" type="string"/>
       <bind nodeset="/in_migration/individualInfo/gender" relevant=" /in_migration/migrationType  = 'EXTERNAL_INMIGRATION'" required="true()" type="select1"/>
       <bind constraint=". &lt; today()" nodeset="/in_migration/individualInfo/dateOfBirth" relevant=" /in_migration/migrationType  = 'EXTERNAL_INMIGRATION'" required="true()" type="date"/>
       <bind nodeset="/in_migration/individualInfo/partialDate" relevant=" /in_migration/migrationType  = 'EXTERNAL_INMIGRATION'" required="true()" type="select1"/>
@@ -663,8 +663,8 @@
       <input ref="/in_migration/individualInfo/individualId">
         <label ref="jr:itext('/in_migration/individualInfo/individualId:label')"/>
       </input>
-      <input ref="/in_migration/individualInfo/permId">
-        <label ref="jr:itext('/in_migration/individualInfo/permId:label')"/>
+      <input ref="/in_migration/individualInfo/lastName">
+        <label ref="jr:itext('/in_migration/individualInfo/lastName:label')"/>
       </input>
       <input ref="/in_migration/individualInfo/motherId">
         <label ref="jr:itext('/in_migration/individualInfo/motherId:label')"/>
@@ -677,9 +677,6 @@
       </input>
       <input ref="/in_migration/individualInfo/middleName">
         <label ref="jr:itext('/in_migration/individualInfo/middleName:label')"/>
-      </input>
-      <input ref="/in_migration/individualInfo/lastName">
-        <label ref="jr:itext('/in_migration/individualInfo/lastName:label')"/>
       </input>
       <select1 ref="/in_migration/individualInfo/gender">
         <label ref="jr:itext('/in_migration/individualInfo/gender:label')"/>

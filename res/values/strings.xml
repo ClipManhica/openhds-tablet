@@ -310,5 +310,7 @@
 	<string name="individual_antepartum_visits_lbl">V. de A.parto:</string>
 	<string name="individual_postpartum_visits_lbl">V. de P.parto:</string>
     
+	<string name="sync_pregnacnies_name">Sync pregnancies identifications</string>
+	<string name="sync_pregnacnies_description">Sync pregnancies identifications</string>
      
 </resources>

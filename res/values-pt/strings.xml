@@ -51,7 +51,7 @@
 	<string name="syncDatabase">Sincr. Base de Dados</string>
 	<string name="syncDatabaseMessage">Esta operação vai tentar descarregar entidades do OpenHDS para o dispositivo. Por favor, seja paciente enquanto a operação está em progresso.</string>
 	<string name="sync_database_description">Sincronizar dados do censo.</string>	
-	<string name="sync_field_worker_description">Sincronizar Trabalhadores de campo.</string>
+	<string name="sync_field_worker_description">Sincronizar Inquiridores.</string>
 	<string name="sync_entities_failure">Ocorreu uma falha ao tentar baixar as entidades do OpenHDS</string>
 	<string name="sync_forms_successful">Formulários obtidos com sucesso</string>
 	<string name="sync_forms_failure">Ocorreu uma falha ao tentar obter os formulários</string>
@@ -274,7 +274,7 @@
     <string name="supervisor_connection_error">Não foi possível conectar-se ao servidor!</string>
     <string name="preference_invalid_label">Invalido!</string>
     <string name="preference_invalid_warning">Valor introduzido inválido</string>
-    <string name="sync_field_worker_name">Sincronizar trabalhadores de campo</string>
+    <string name="sync_field_worker_name">Sincronizar inquiridores</string>
     <string name="field_worker_bad_credentials">Credencias do trabalhadore de campo invalidas</string>
     <string name="region_label">Província</string>
     <string name="map_area_label">Area do mapa</string>
@@ -318,8 +318,8 @@
 	<string name="sync_task_items"> ítens</string>
 	<string name="sync_task_extraforms">  forms. extras.</string>
 	
-	<string name="synced_fws_lbl">Trabalhadores de campo sincronizados.</string>
-	<string name="failed_sync_fws_lbl">Não foi possível sincronizar os trabalhadores de campo.</string>
+	<string name="synced_fws_lbl">Inquiridores sincronizados.</string>
+	<string name="failed_sync_fws_lbl">Não foi possível sincronizar os inquiridores.</string>
     
     <string name="sync_task_clip_pregnancy_ids"> Identificações de Gravidezes.</string>
     
@@ -333,5 +333,8 @@
     
     <string name="hello_lbl">Olá</string>
     <string name="locale_lang">pt</string>
+    
+    <string name="sync_pregnacnies_name">Sincronizar Clip Id\'s</string>
+	<string name="sync_pregnacnies_description">Sincronição de Ids. de gravidezes!</string>
 
 </resources>

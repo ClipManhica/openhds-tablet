@@ -136,9 +136,11 @@ public class SyncEntitiesTask extends
 		case SETTINGS:
 			builder.append(mContext.getString(R.string.sync_task_settings));
 			break;		
+			/*
 		case PREGNANCY_IDS:
 			builder.append(mContext.getString(R.string.sync_task_clip_pregnancy_ids));
-			break;			
+			break;
+			*/			
 		}
 
 		if (values.length > 0) {
@@ -191,8 +193,8 @@ public class SyncEntitiesTask extends
 			entity = Entity.SETTINGS;
 			processUrl(baseurl + API_PATH + "/settings");
 			
-			entity = Entity.PREGNANCY_IDS;
-			processUrl("http://sap.manhica.net:4700/files/clip/pregnancy_control.xml"); //changing to control
+			//entity = Entity.PREGNANCY_IDS;
+			//processUrl("http://sap.manhica.net:4700/files/clip/pregnancy_control.xml"); //changing to control
 		} catch (Exception e) {
 			e.printStackTrace();
 			return HttpTask.EndResult.FAILURE;
@@ -216,7 +218,7 @@ public class SyncEntitiesTask extends
 		resolver.delete(OpenHDS.Locations.CONTENT_ID_URI_BASE, null, null);
 		resolver.delete(OpenHDS.Settings.CONTENT_ID_URI_BASE, null, null);
 		
-		deleteAllClipDatabase();
+		//deleteAllClipDatabase();
 	}
 
 	private void processUrl(String url) throws Exception {
@@ -289,11 +291,11 @@ public class SyncEntitiesTask extends
 					processRelationshipParams(parser);
 				} else if(name.equalsIgnoreCase("generalSettings")) {
 					processSettingsParams(parser);
-				} else if(name.equalsIgnoreCase("pregnaciesIdenfications")) {
+				}/* else if(name.equalsIgnoreCase("pregnaciesIdenfications")) {
 					processPregnancyIdsParams(parser);
 				} else if(name.equalsIgnoreCase("pregnanciesControl")) {
 					processPregnancyControlParams(parser);
-				}
+				}*/
 				break;
 			}
 			eventType = parser.next();
@@ -570,9 +572,7 @@ public class SyncEntitiesTask extends
 
 		return groups;
 	}
-
-	
-	
+		
 	private void processHierarchyLevelsParams(XmlPullParser parser)
 			throws XmlPullParserException, IOException {
 		parser.nextTag();
@@ -602,6 +602,7 @@ public class SyncEntitiesTask extends
 					values.toArray(emptyArray));
 		}
 	}
+	
 	private void processRoundParams(XmlPullParser parser)
 			throws XmlPullParserException, IOException {
 		parser.nextTag();
@@ -964,8 +965,7 @@ public class SyncEntitiesTask extends
 		
 		database.close();
 	}		
-	
-	
+		
 	private void deleteAllClipDatabase(){
 		org.openhds.mobile.clip.database.Database database = new org.openhds.mobile.clip.database.Database(mContext);
         database.open();

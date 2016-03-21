@@ -14,6 +14,7 @@ import org.openhds.mobile.task.HttpTask.RequestContext;
 import org.openhds.mobile.task.SyncEntitiesTask;
 import org.openhds.mobile.task.SyncFieldworkersTask;
 import org.openhds.mobile.task.SyncFormsTask;
+import org.openhds.mobile.task.SyncPregnanciesIdsTask;
 import org.openhds.mobile.utilities.SyncDatabaseHelper;
 
 import android.app.Activity;
@@ -67,7 +68,14 @@ public class SupervisorMainActivity extends Activity implements OnClickListener,
 				getResourceString(this, R.string.download_extraform_button),
 				getResourceString(this, R.string.sync_extraforms),
 				getResourceString(this, R.string.sync_extraforms), this,
-				supervisorOptionsList);				
+				supervisorOptionsList);
+		
+		makeNewGenericButton(
+				this,
+				getResourceString(this, R.string.sync_pregnacnies_description),
+				getResourceString(this, R.string.sync_pregnacnies_name),
+				getResourceString(this, R.string.sync_pregnacnies_name), this,
+				supervisorOptionsList);
 
 		if (null != savedInstanceState) {
 			return;
@@ -111,6 +119,9 @@ public class SupervisorMainActivity extends Activity implements OnClickListener,
 		} else if (tag.equals(getResourceString(this,
 				R.string.sync_extraforms))) {
 			syncExtraForms();
+		} else if (tag.equals(getResourceString(this,
+				R.string.sync_pregnacnies_name))) {
+			syncPregnancies();
 		}
 	}
 	
@@ -165,6 +176,22 @@ public class SupervisorMainActivity extends Activity implements OnClickListener,
 				syncDatabaseHelper.getProgressDialog(), syncDatabaseHelper);
 		syncDatabaseHelper.setCurrentTask(currentTask);
 
+		syncDatabaseHelper.startSync();
+	}
+	
+	private void syncPregnancies(){
+		
+		String username = (String) getIntent().getExtras().get(
+				OpeningActivity.USERNAME_KEY);
+		String password = (String) getIntent().getExtras().get(
+				OpeningActivity.PASSWORD_KEY);
+
+		String openHdsBaseUrl = getPreferenceString(this,
+				R.string.openhds_server_url_key, "");
+		SyncPregnanciesIdsTask currentTask = new SyncPregnanciesIdsTask(openHdsBaseUrl,
+				username, password, syncDatabaseHelper.getProgressDialog(),
+				this, syncDatabaseHelper);
+		syncDatabaseHelper.setCurrentTask(currentTask);
 		syncDatabaseHelper.startSync();
 	}
 		
