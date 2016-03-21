@@ -4,15 +4,20 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.openhds.mobile.OpenHDS;
+import org.openhds.mobile.clip.database.Database.PregnancyControlTable;
+import org.openhds.mobile.clip.model.PregnancyControl;
 import org.openhds.mobile.database.queries.Converter;
 import org.openhds.mobile.database.queries.Queries;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 /**
  * A LocationVisit represents a single visit to a specific location. This class
@@ -273,7 +278,7 @@ public class LocationVisit implements Serializable {
     //Generate the locationName to handle the HouseNo Code (##-####-###) from Manhiça DSS
  	private String generateLocationName(ContentResolver resolver) { 		 		 
  		
- 		String cluster = (isClip() ? getClusterId(getLatestLevelName())+"-" : "" );
+ 		 String cluster = (isClip() ? getClusterId(getLatestLevelName())+"-" : "" );
  		
          Cursor cursor = resolver.query(OpenHDS.Locations.CONTENT_ID_URI_BASE,
                  new String[] { OpenHDS.Locations.COLUMN_LOCATION_NAME }, OpenHDS.Locations.COLUMN_LOCATION_NAME
@@ -283,38 +288,33 @@ public class LocationVisit implements Serializable {
          String generatedName = null;
          String baseName = cluster + getLatestLevelName(); 
          
+         List<String> allLocations = new ArrayList<String>();
+         
+         while(cursor.moveToNext()){
+        	 allLocations.add(cursor.getString(0));
+         }
+         
          //001-999
          //NEXT       
-         if (cursor.moveToFirst()) {
+         if (allLocations.size() > 0) {
          	
          	int nextCode = 0;        	       	        	
          	        	
          	for (int i=1; i<=999; i++){
-         		        		        		
-         		int locCode = 0;
          		
          		try{
+         			String locName = String.format(baseName + "-" + "%03d", i);
          			
-         			String locName = cursor.getString(0);
-             		String strLocCode = locName.substring(locName.length()-3);
-         			
-         			locCode = Integer.parseInt(strLocCode);
-         			
-         			if (i != locCode){
+         			//Log.d("possible-locname", ""+locName);         			
+         			if (allLocations.contains(locName)){
+         				continue;
+         			}else{
          				nextCode = i;
          				break;
-         			}else{
-         				if (!cursor.moveToNext()){ //Cant Go Next
-         					nextCode = i+1;
-         					break;
-         				}
-         				
-         				continue;
          			}
          			
          		}catch (Exception e){        			
-         			e.printStackTrace();
-         			cursor.moveToNext();
+         			e.printStackTrace();         			
          			break;
          		}        		
          	}
@@ -324,11 +324,12 @@ public class LocationVisit implements Serializable {
          	}else{
          		generatedName = String.format(getLatestLevelName() + "-" + "%03d", nextCode);
          	}        	
-             //generatedName = generateLocationNameFrom(cursor.getString(0));
+             
          } else {
              generatedName = getLatestLevelName() + "-001";
          }
 
+         allLocations.clear();
          cursor.close();
          return cluster + generatedName;
      }
@@ -590,36 +591,32 @@ public class LocationVisit implements Serializable {
 
 		String generatedPermID = null;
 
+		List<String> allPermIds = new ArrayList<String>();
+	         
+	    while(cursor.moveToNext()){
+	    	allPermIds.add(cursor.getString(0));
+	    }
+	         		
 		// 001-999
 		// NEXT
-		if (cursor.moveToFirst()) {
+		if (allPermIds.size() > 0) {
 
 			int nextCode = 0;
 
 			for (int i = 1; i <= 99; i++) {
-				String permId = cursor.getString(0);
-				String strMemberNo = permId.substring(permId.length() - 2);
-
-				int memberNo = 0;
-
+				
 				try {
-					memberNo = Integer.parseInt(strMemberNo);
-
-					if (i != memberNo && memberNo != 0) {
-						nextCode = i;
-						break;
-					} else {
-						
-						if (!cursor.moveToNext()){ //Cant Go Next
-        					nextCode = i+1;
-        					break;
-        				}
-        										
-						continue;
-					}
-
-				} catch (NumberFormatException e) {
-					cursor.moveToNext();
+					String permid = String.format(location.getName() + "-" + "%02d", i);
+         			
+         			//Log.d("possible-locname", ""+locName);         			
+         			if (allPermIds.contains(permid)){
+         				continue;
+         			}else{
+         				nextCode = i;
+         				break;
+         			}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 
@@ -652,6 +649,12 @@ public class LocationVisit implements Serializable {
 
 		int countBabies = 0;
 
+		List<String> allPermIds = new ArrayList<String>();
+        
+	    while(cursor.moveToNext()){
+	    	allPermIds.add(cursor.getString(0));
+	    }
+		
 		// 001-999
 		// NEXT
 		if (cursor.moveToFirst()) {
@@ -659,33 +662,24 @@ public class LocationVisit implements Serializable {
 			int nextCode = 0;
 
 			for (int i = 1; i <= 99; i++) {
-				String permId = cursor.getString(0);
-				String strMemberNo = permId.substring(permId.length() - 2);
-
-				int memberNo = 0;
-
+				
 				try {
-					memberNo = Integer.parseInt(strMemberNo);
+					
+					String permid = String.format(location.getName() + "-" + "%02d", i);
+         			
+         			//Log.d("possible-locname", ""+locName);         			
+         			if (allPermIds.contains(permid)){
+         				continue;
+         			}else{
+         				nextCode = i;
+         				         				
+         				ids[countBabies++] = String.format(location.getName() + "-" + "%02d", nextCode);
 
-					if (i != memberNo && memberNo != 0) {
-						nextCode = i;
-						ids[countBabies++] = String.format(location.getName() + "-" + "%02d", nextCode);
-
-						if (cursor.moveToNext() == false || countBabies == liveBirthCount) {
+						if (countBabies == liveBirthCount) {
 							break;
 						}
-
-					} else {
-						if (!cursor.moveToNext()){ //Cant Go Next
-        					nextCode = i+1;
-        					ids[countBabies++] = String.format(location.getName() + "-" + "%02d", nextCode);
-        					break;
-        				}
-        				
-						cursor.moveToNext();
-						continue;
-					}
-
+         			}
+					
 				} catch (NumberFormatException e) {
 					cursor.moveToNext();
 				}
@@ -745,5 +739,43 @@ public class LocationVisit implements Serializable {
 		}
 		
 		return "00";
+	}
+	
+	public PregnancyControl getLastPregnancyControl(Context mContext, Individual individual) {
+		PregnancyControl pregnancyControl = null;
+		
+		org.openhds.mobile.clip.database.Database db = new org.openhds.mobile.clip.database.Database(mContext);
+		db.open();
+		
+		Cursor cursor = db.query(PregnancyControl.class, PregnancyControlTable.COLUMN_PERM_ID + " = ?", new String[] { individual.getLastName() }, null, null, PregnancyControlTable.COLUMN_PREGNANCY_ID + " DESC");
+		
+		Log.d("search pid", ""+individual.getLastName()+", "+cursor.getCount());
+		
+		if (cursor != null && cursor.moveToFirst()){ //If already exists a pregnancy_id
+			
+			//Create the pregnancy_id based on the last created
+			pregnancyControl = org.openhds.mobile.clip.database.Converter.cursorToPregnancyControl(cursor);
+		}
+		
+		return pregnancyControl;
+	}
+	
+	public PregnancyControl getLastPregnancyControl(Context mContext, String individualPermId) {
+		PregnancyControl pregnancyControl = null;
+		
+		org.openhds.mobile.clip.database.Database db = new org.openhds.mobile.clip.database.Database(mContext);
+		db.open();
+		
+		Cursor cursor = db.query(PregnancyControl.class, PregnancyControlTable.COLUMN_PERM_ID + " = ?", new String[] { individualPermId }, null, null, PregnancyControlTable.COLUMN_PREGNANCY_ID + " DESC");
+		
+		//Log.d("search pid", ""+individual.getLastName()+", "+cursor.getCount());
+		
+		if (cursor != null && cursor.moveToFirst()){ //If already exists a pregnancy_id
+			
+			//Create the pregnancy_id based on the last created
+			pregnancyControl = org.openhds.mobile.clip.database.Converter.cursorToPregnancyControl(cursor);
+		}
+		
+		return pregnancyControl;
 	}
 }

@@ -126,10 +126,10 @@ public class FormFiller {
         return form;
     }
 
-    public FilledForm fillDeathForm(LocationVisit locationVisit, SocialGroup sg) {
+    public FilledForm fillDeathForm(LocationVisit locationVisit, SocialGroup sg, int nrMembers) {
     	FilledForm form = null;
     	//Check if selected individual is HoH. If yes, fill in DeathToHoH form, otherwise normal death form
-    	if (locationVisit.getSelectedIndividual().getExtId().equalsIgnoreCase(locationVisit.getLocation().getHead())) {
+    	if (locationVisit.getSelectedIndividual().getExtId().equalsIgnoreCase(locationVisit.getLocation().getHead()) && nrMembers>1) {
     		form = new FilledForm(UpdateEvent.DEATHTOHOH);
     		//Set Successor extId to current HoH extId. 
     		//In the case where the current user is the HoH and the only member of said HH, this value won't change,
