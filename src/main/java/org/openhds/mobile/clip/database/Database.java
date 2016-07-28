@@ -39,10 +39,22 @@ public class Database {
 		public static final String COLUMN_VISIT_NUMBER = "visitNumber";
 		public static final String COLUMN_ANTEPARTUM_VISITS = "antepartumVisits";
 		public static final String COLUMN_POSTPARTUM_VISITS = "postpartumVisits";
+		public static final String COLUMN_NR_BABIES = "nrBabies";
+		public static final String COLUMN_BABY_1 = "baby1";
+		public static final String COLUMN_BABY_2 = "baby2";
+		public static final String COLUMN_BABY_3 = "baby3";
+		public static final String COLUMN_BABY_4 = "baby4";
+		public static final String COLUMN_BABY_5 = "baby5";
+		public static final String COLUMN_BABY_6 = "baby6";
+		public static final String COLUMN_BABY_7 = "baby7";
+		public static final String COLUMN_BABY_8 = "baby8";
+		public static final String COLUMN_BABY_9 = "baby9";
 		
 		public static final String[] ALL_COLUMNS = {COLUMN_ID, COLUMN_INDIVIDUAL_ID, COLUMN_PERM_ID, COLUMN_PREGNANCY_ID, 
 													COLUMN_ESTIMATED_DOB, COLUMN_DATE_OF_BIRTH, COLUMN_HAS_DELIVERED, COLUMN_VISIT_NUMBER,
-													COLUMN_ANTEPARTUM_VISITS, COLUMN_POSTPARTUM_VISITS};
+													COLUMN_ANTEPARTUM_VISITS, COLUMN_POSTPARTUM_VISITS,
+													COLUMN_NR_BABIES, COLUMN_BABY_1, COLUMN_BABY_2, COLUMN_BABY_3, COLUMN_BABY_4,
+													COLUMN_BABY_5, COLUMN_BABY_6, COLUMN_BABY_7, COLUMN_BABY_8, COLUMN_BABY_9};
 		}
 	
 	private DatabaseHelper dbHelper;

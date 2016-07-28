@@ -19,6 +19,16 @@ public class PregnancyControl implements Serializable, org.openhds.mobile.clip.d
 	private int visitNumber;
 	private int antepartumVisits;
 	private int postpartumVisits;
+	private int nrBabies;
+	private String baby1;
+	private String baby2;
+	private String baby3;
+	private String baby4;
+	private String baby5;
+	private String baby6;
+	private String baby7;
+	private String baby8;
+	private String baby9;
 		
 		
 	public PregnancyControl(String individualId, String permId, String pregnancyId, String estimatedDob, String dateOfBirth, int hasDelivered, int visitNumber, int antepartumVisits, int postpartumVisits) {
@@ -117,6 +127,86 @@ public class PregnancyControl implements Serializable, org.openhds.mobile.clip.d
 	public void setPostpartumVisits(int postpartumVisits) {
 		this.postpartumVisits = postpartumVisits;
 	}
+		
+	public int getNrBabies() {
+		return nrBabies;
+	}
+
+	public void setNrBabies(int nrBabies) {
+		this.nrBabies = nrBabies;
+	}
+
+	public String getBaby1() {
+		return baby1;
+	}
+
+	public void setBaby1(String baby1) {
+		this.baby1 = baby1;
+	}
+
+	public String getBaby2() {
+		return baby2;
+	}
+
+	public void setBaby2(String baby2) {
+		this.baby2 = baby2;
+	}
+
+	public String getBaby3() {
+		return baby3;
+	}
+
+	public void setBaby3(String baby3) {
+		this.baby3 = baby3;
+	}
+
+	public String getBaby4() {
+		return baby4;
+	}
+
+	public void setBaby4(String baby4) {
+		this.baby4 = baby4;
+	}
+
+	public String getBaby5() {
+		return baby5;
+	}
+
+	public void setBaby5(String baby5) {
+		this.baby5 = baby5;
+	}
+
+	public String getBaby6() {
+		return baby6;
+	}
+
+	public void setBaby6(String baby6) {
+		this.baby6 = baby6;
+	}
+
+	public String getBaby7() {
+		return baby7;
+	}
+
+	public void setBaby7(String baby7) {
+		this.baby7 = baby7;
+	}
+
+	public String getBaby8() {
+		return baby8;
+	}
+
+	public void setBaby8(String baby8) {
+		this.baby8 = baby8;
+	}
+
+	public String getBaby9() {
+		return baby9;
+	}
+
+	public void setBaby9(String baby9) {
+		this.baby9 = baby9;
+	}
 
 	public String getTableName() {
 		return Database.PregnancyControlTable.TABLE_NAME;
@@ -134,6 +224,16 @@ public class PregnancyControl implements Serializable, org.openhds.mobile.clip.d
 		cv.put(Database.PregnancyControlTable.COLUMN_VISIT_NUMBER, visitNumber);
 		cv.put(Database.PregnancyControlTable.COLUMN_ANTEPARTUM_VISITS, antepartumVisits);
 		cv.put(Database.PregnancyControlTable.COLUMN_POSTPARTUM_VISITS, postpartumVisits);
+		cv.put(Database.PregnancyControlTable.COLUMN_NR_BABIES, nrBabies);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_1, baby1);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_2, baby2);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_3, baby3);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_4, baby4);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_5, baby5);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_6, baby6);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_7, baby7);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_8, baby8);
+		cv.put(Database.PregnancyControlTable.COLUMN_BABY_9, baby9);
 		
 		return cv;
 	}

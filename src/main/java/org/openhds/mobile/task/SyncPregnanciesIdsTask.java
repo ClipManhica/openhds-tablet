@@ -349,10 +349,49 @@ public class SyncPregnanciesIdsTask extends
 			//Log.d("dob", parser.nextText());
 			
 			parser.nextTag(); //estDob
-			pregnancyControl.setEstimatedDob(parser.nextText());
-			
+			pregnancyControl.setEstimatedDob(parser.nextText());			
 			//Log.d("estDob", parser.nextText());
-						
+			
+			parser.nextTag(); //nrBabies
+			pregnancyControl.setNrBabies(Integer.parseInt(parser.nextText()));			
+			//Log.d("nrBabies", parser.nextText());
+			
+			parser.nextTag(); //baby1
+			pregnancyControl.setBaby1(parser.nextText());			
+			//Log.d("baby1", parser.nextText());
+			
+			parser.nextTag(); //baby2
+			pregnancyControl.setBaby2(parser.nextText());			
+			//Log.d("baby2", parser.nextText());
+			
+			parser.nextTag(); //baby3
+			pregnancyControl.setBaby3(parser.nextText());			
+			//Log.d("baby3", parser.nextText());
+			
+			parser.nextTag(); //baby4
+			pregnancyControl.setBaby4(parser.nextText());			
+			//Log.d("baby4", parser.nextText());
+			
+			parser.nextTag(); //baby5
+			pregnancyControl.setBaby5(parser.nextText());			
+			//Log.d("baby5", parser.nextText());
+			
+			parser.nextTag(); //baby6
+			pregnancyControl.setBaby6(parser.nextText());			
+			//Log.d("baby6", parser.nextText());
+			
+			parser.nextTag(); //baby7
+			pregnancyControl.setBaby7(parser.nextText());			
+			//Log.d("baby7", parser.nextText());
+			
+			parser.nextTag(); //baby8
+			pregnancyControl.setBaby8(parser.nextText());			
+			//Log.d("baby8", parser.nextText());
+			
+			parser.nextTag(); //baby9
+			pregnancyControl.setBaby9(parser.nextText());			
+			//Log.d("baby9", parser.nextText());
+			
 			valuesTb.add(pregnancyControl);
 			
 			publishProgress(count);

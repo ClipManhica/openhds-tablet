@@ -46,7 +46,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			 + Database.PregnancyControlTable.COLUMN_HAS_DELIVERED + " INTEGER,"
 			 + Database.PregnancyControlTable.COLUMN_VISIT_NUMBER + " INTEGER,"
 			 + Database.PregnancyControlTable.COLUMN_ANTEPARTUM_VISITS + " INTEGER,"
-			 + Database.PregnancyControlTable.COLUMN_POSTPARTUM_VISITS + " INTEGER);"
+			 + Database.PregnancyControlTable.COLUMN_POSTPARTUM_VISITS + " INTEGER,"
+			 + Database.PregnancyControlTable.COLUMN_NR_BABIES + " INTEGER,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_1 + " TEXT,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_2 + " TEXT,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_3 + " TEXT,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_4 + " TEXT,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_5 + " TEXT,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_6 + " TEXT,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_7 + " TEXT,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_8 + " TEXT,"
+			 + Database.PregnancyControlTable.COLUMN_BABY_9 + " TEXT);"
+			 
 			 
 			 + " CREATE UNIQUE INDEX IDX_PREGNANCY_CNTL_ID ON " + Database.PregnancyControlTable.TABLE_NAME
              + "(" +  Database.PregnancyControlTable.COLUMN_INDIVIDUAL_ID + ");"
