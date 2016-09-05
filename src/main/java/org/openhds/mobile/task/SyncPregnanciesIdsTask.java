@@ -1,13 +1,15 @@
 package org.openhds.mobile.task;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,13 +24,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.openhds.mobile.OpenHDS;
 import org.openhds.mobile.R;
-import org.openhds.mobile.clip.database.Database.PregnancyControlTable;
 import org.openhds.mobile.clip.model.PregnacyIdentification;
 import org.openhds.mobile.clip.model.PregnancyControl;
 import org.openhds.mobile.listener.SyncDatabaseListener;
-import org.openhds.mobile.model.Settings;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -38,6 +37,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 
 /**
@@ -74,6 +74,8 @@ public class SyncPregnanciesIdsTask extends
 	private State state;
 	private Entity entity;
 
+	private boolean isDownloadingZipFile;
+	
 	private enum State {
 		DOWNLOADING, SAVING
 	}
@@ -115,7 +117,11 @@ public class SyncPregnanciesIdsTask extends
 		}
 
 		if (values.length > 0) {
-			builder.append(" " + mContext.getString(R.string.sync_task_saved)  + " " + values[0]  + " " +  mContext.getString(R.string.sync_task_items));
+			String msg = " " + mContext.getString(R.string.sync_task_saved)  + " " + values[0]  + " " +  mContext.getString(R.string.sync_task_items);
+			if (state == State.DOWNLOADING && isDownloadingZipFile){
+				msg = " " + mContext.getString(R.string.sync_task_saved)  + " " + values[0]  + "KB";
+			}
+			builder.append(msg);
 		}
 
 		dialog.setMessage(builder.toString());
@@ -138,7 +144,8 @@ public class SyncPregnanciesIdsTask extends
 		try {	
 			
 			entity = Entity.PREGNANCY_IDS;
-			processUrl("http://sap.manhica.net:4700/files/clip/pregnancy_control.xml"); //changing to control
+			//processUrl("http://sap.manhica.net:4700/files/clip/pregnancy_control.xml"); //changing to control
+			processUrl("http://sap.manhica.net:4780/manhica-dbsync/api/clip-explorer/pregnancy_control/zip"); //changing to control
 		} catch (Exception e) {
 			e.printStackTrace();
 			return HttpTask.EndResult.FAILURE;
@@ -152,27 +159,99 @@ public class SyncPregnanciesIdsTask extends
 		// foreign keys	
 		deleteAllClipDatabase();
 	}
+	
+	private String getAppStoragePath(){
+		File root = Environment.getExternalStorageDirectory();
+		String destinationPath = root.getAbsolutePath() + File.separator
+				+ "Android" + File.separator + "data" + File.separator
+				+ "org.openhds.mobile" + File.separator + "files" + File.separator + "downloads" + File.separator;
+
+		File baseDir = new File(destinationPath);
+		if (!baseDir.exists()) {
+			boolean created = baseDir.mkdirs();
+			if (!created) {
+				return destinationPath;
+			}
+		}
+		
+		return destinationPath;
+	}
+	
+	private InputStream saveFileToStorage(InputStream inputStream) throws Exception {
+
+		String path = getAppStoragePath() + "pregcontrol.zip";
+		FileOutputStream fout = new FileOutputStream(path);
+		byte[] buffer = new byte[10*1024];
+		int len = 0;
+		long total = 0;
+
+		publishProgress();
+
+		while ((len = inputStream.read(buffer)) != -1){
+			fout.write(buffer, 0, len);
+			total += len;
+			int perc =  (int) ((total/(1024)));
+			publishProgress(perc);
+		}
+
+		fout.close();
+		inputStream.close();
+
+		FileInputStream fin = new FileInputStream(path);
+
+		return fin;
+	}
+	
+	private void processZIPDocument(InputStream inputStream) throws Exception {
+
+		Log.d("zip", "processing zip file");
+
+
+		ZipInputStream zin = new ZipInputStream(inputStream);
+		ZipEntry entry = zin.getNextEntry();
+
+		Log.d("zip-entry", ""+entry);
+		
+		if (entry != null){
+			processXMLDocument(zin);
+			zin.closeEntry();
+		}
+
+		zin.close();
+	}
 
 	private void processUrl(String url) throws Exception {
 		state = State.DOWNLOADING;
 		publishProgress();
 
+		this.isDownloadingZipFile = url.endsWith("zip");
+		
 		httpGet = new HttpGet(url);
 		processResponse();
 	}
 
 	private void processResponse() throws Exception {
 		InputStream inputStream = getResponse();
-		if (inputStream != null)
-			processXMLDocument(inputStream);
+		
+		if (this.isDownloadingZipFile){
+			InputStream zipInputStream = saveFileToStorage(inputStream);
+			if (zipInputStream != null){
+				Log.d("download", "zip = "+zipInputStream);
+				processZIPDocument(zipInputStream);
+				zipInputStream.close();
+			}
+				
+		}else{
+			if (inputStream != null)
+				processXMLDocument(inputStream);
+		}
 	}
 
-	private InputStream getResponse() throws AuthenticationException,
-			ClientProtocolException, IOException {
+	private InputStream getResponse() throws AuthenticationException, ClientProtocolException, IOException {
 		HttpResponse response = null;
 
-		httpGet.addHeader(new BasicScheme().authenticate(creds, httpGet));
-		httpGet.addHeader("content-type", "application/xml");
+		//httpGet.addHeader(new BasicScheme().authenticate(creds, httpGet));
+		//httpGet.addHeader("content-type", "application/xml");
 		response = client.execute(httpGet);
 		
 		//Handle 404
@@ -205,9 +284,8 @@ public class SyncPregnanciesIdsTask extends
 					int cnt = Integer.parseInt(parser.getText());
 					publishProgress(cnt);
 					parser.nextTag();
-				} else if(name.equalsIgnoreCase("pregnaciesIdenfications")) {
-					processPregnancyIdsParams(parser);
 				} else if(name.equalsIgnoreCase("pregnanciesControl")) {
+					Log.d("zip-xmladasd", "asd");
 					processPregnancyControlParams(parser);
 				}
 				break;
@@ -226,73 +304,15 @@ public class SyncPregnanciesIdsTask extends
 	protected void onPostExecute(HttpTask.EndResult result) {
 		listener.collectionComplete(result);
 	}
-	
-	private void processPregnancyIdsParams(XmlPullParser parser) throws XmlPullParserException, IOException {
-		
-		org.openhds.mobile.clip.database.Database database = new org.openhds.mobile.clip.database.Database(mContext);
-        database.open();
-		
-        values.clear();
-		
-		int count = 0;
-		List<PregnacyIdentification> valuesTb = new ArrayList<PregnacyIdentification>();
-		
-        
-		parser.nextTag();
-		
-		while (notEndOfXmlDoc("pregnaciesIdenfications", parser)) {
-			count++;
-						
-			PregnacyIdentification pregId = new PregnacyIdentification();
-			
-			parser.nextTag(); //individualId
-			pregId.setIndividualId(parser.nextText());
-			
-			//Log.d("individualId", parser.nextText());
-			
-			parser.nextTag(); //permId						
-			pregId.setPermId(parser.nextText());
-			
-			//Log.d("permId", parser.nextText());
-			
-			parser.nextTag(); //pregnancyId
-			pregId.setPregnancyId(parser.nextText());
-			
-			//Log.d("pregnancyId", parser.nextText());
-			
-			parser.nextTag(); //count
-			pregId.setCount(Integer.parseInt(parser.nextText()));
-			
-			//Log.d("count", parser.nextText());
-						
-			valuesTb.add(pregId);
-			
-			publishProgress(count);
 
-			parser.nextTag(); // </pregnancyIdentification>
-			parser.nextTag(); // <pregnancyIdentification>			
-			
-		}
+	private void processPregnancyControlParams(XmlPullParser parser) throws XmlPullParserException, IOException {
 		
 		state = State.SAVING;
 		entity = Entity.PREGNANCY_IDS;
 		
-		if (!valuesTb.isEmpty()) {
-			count = 0;
-			for (PregnacyIdentification p : valuesTb){
-				count++;
-				database.insert(p);
-				publishProgress(count);
-			}
-		}
-		
-		database.close();
-	}		
-	
-	private void processPregnancyControlParams(XmlPullParser parser) throws XmlPullParserException, IOException {
-		
 		org.openhds.mobile.clip.database.Database database = new org.openhds.mobile.clip.database.Database(mContext);
         database.open();
+        database.beginTransaction();
 		
         values.clear();
 		
@@ -392,18 +412,22 @@ public class SyncPregnanciesIdsTask extends
 			pregnancyControl.setBaby9(parser.nextText());			
 			//Log.d("baby9", parser.nextText());
 			
-			valuesTb.add(pregnancyControl);
+			//valuesTb.add(pregnancyControl);
+						
+			database.insert(pregnancyControl);
 			
-			publishProgress(count);
-
+			if (count % 100 == 0) {
+				//persistLocations();
+				//values.clear();
+				publishProgress(count);
+			}
+			
 			parser.nextTag(); // </pregnancyIdentification>
 			parser.nextTag(); // <pregnancyIdentification>			
 			
 		}
-		
-		state = State.SAVING;
-		entity = Entity.PREGNANCY_IDS;
-		
+						
+		/*
 		if (!valuesTb.isEmpty()) {
 			count = 0;
 			for (PregnancyControl p : valuesTb){
@@ -412,7 +436,10 @@ public class SyncPregnanciesIdsTask extends
 				publishProgress(count);
 			}
 		}
+		*/
 		
+		database.setTransactionSuccessful();
+		database.endTransaction();
 		database.close();
 	}		
 		
